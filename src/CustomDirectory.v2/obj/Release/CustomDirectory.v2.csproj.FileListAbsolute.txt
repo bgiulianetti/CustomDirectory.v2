@@ -1,0 +1,5 @@
+C:\Users\bgiulianetti\Documents\Git\CustomDirectory.v2\CustomDirectory.v2\bin\CustomDirectory.v2.dll.config
+C:\Users\bgiulianetti\Documents\Git\CustomDirectory.v2\CustomDirectory.v2\bin\CustomDirectory.v2.dll
+C:\Users\bgiulianetti\Documents\Git\CustomDirectory.v2\CustomDirectory.v2\bin\CustomDirectory.v2.pdb
+C:\Users\bgiulianetti\Documents\Git\CustomDirectory.v2\CustomDirectory.v2\obj\Release\CustomDirectory.v2.dll
+C:\Users\bgiulianetti\Documents\Git\CustomDirectory.v2\CustomDirectory.v2\obj\Release\CustomDirectory.v2.pdb
