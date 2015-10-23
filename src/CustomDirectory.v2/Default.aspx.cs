@@ -21,13 +21,22 @@ namespace CustomDirectory.v2
             string last = Request.QueryString["l"];
             string pais = Request.QueryString["p"];
             string number = Request.QueryString["n"];
-            int start = Int32.Parse(Request.QueryString["start"]);
+            string start = Request.QueryString["start"];
             #endregion
 
+            if (first == null) first = string.Empty;
+            if (last == null) last = string.Empty;
+            if (pais == null) pais = string.Empty;
+            if (number == null) number = string.Empty;
+            if (start == null) start = string.Empty;
 
-            string cadena_chile = "", cadena_argentina = "", cadena_ambos = "";
+
+            string cadena_chile = string.Empty;
+            string cadena_argentina = string.Empty;
+            string cadena_ambos = string.Empty;
             bool vacio = false;
-            if (string.Equals(string.Empty, pais))
+
+            if (pais == string.Empty)
             {
                 cadena_chile = GetDirectory("chile", last, first, number, start.ToString());
                 cadena_argentina = GetDirectory("argentina", last, first, number, start.ToString());
@@ -91,27 +100,17 @@ namespace CustomDirectory.v2
 
         private string GetDirectory(string pais, string last, string first, string number, string start)
         {
-            string url =GetDirectoryUrlByCountry(pais) + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            string url =GetDirectoryUrlByCountry(pais) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader sr = new StreamReader(response.GetResponseStream());
             string cadena = sr.ReadToEnd();
             sr.Close();
 
-            cadena = cadena.Replace("<?xml version=\"1.0\"?>", "").Replace("<CiscoIPPhoneDirectory>", "").Replace("<Name>", "<Name>[ARG] ").Replace("Garc�a", "Garcia").Replace("<Telephone>", "<Telephone>" + GetPrefixByCountry(pais));
-
-            for (int i = 0; i < cadena.Length; i++)
-                if (cadena[i].ToString() == "<" && cadena[i + 1].ToString() == "P")
-                    cadena = cadena.Substring(0, i);
-
-            int cant = 0;
-            for (int i = 0; i < cadena.Length; i++)
-            {
-                if (cadena[i].ToString() == "<" && cadena[i + 1].ToString() == "D")
-                    cant++;
-                if (cant == 16)
-                    cadena = cadena.Substring(0, i);
-            }
+            cadena = FixFormatDirectoryString(cadena, pais);
+            cadena = DeleteBottomMenu(cadena);
+            cadena = SelectFirstNRecords(cadena, 16);
+            
             return cadena;
         }
         private string GetDirectoryUrlByCountry(string country)
@@ -181,6 +180,36 @@ namespace CustomDirectory.v2
                 "<Position>5</Position>" + Environment.NewLine +
                 "</SoftKeyItem>" + Environment.NewLine +
                 "</CiscoIPPhoneDirectory>";
+        }
+        private string DeleteBottomMenu(string cadena)
+        {
+            for (int i = 0; i < cadena.Length; i++)
+                if (cadena[i].ToString() == "<" && cadena[i + 1].ToString() == "P")
+                    cadena = cadena.Substring(0, i);
+            return cadena;
+        }
+        private string SelectFirstNRecords(string cadena, int recordsCount)
+        {
+            int cant = 0;
+            for (int i = 0; i < cadena.Length; i++)
+            {
+                if (cadena[i].ToString() == "<" && cadena[i + 1].ToString() == "D")
+                    cant++;
+                if (cant == recordsCount)
+                    cadena = cadena.Substring(0, i);
+            }
+            return cadena;
+        }
+        private string FixFormatDirectoryString(string cadena, string pais)
+        {
+            string prefix = GetPrefixByCountry(pais);
+            cadena = cadena.Replace("<?xml version=\"1.0\"?>", "").
+                            Replace("<CiscoIPPhoneDirectory>", "").
+                            Replace("<Name>", "<Name>[ARG] ").
+                            Replace("Garc�a", "Garcia").
+                            Replace("<Telephone>", "<Telephone>" + prefix);
+
+            return cadena;
         }
     }
 }
