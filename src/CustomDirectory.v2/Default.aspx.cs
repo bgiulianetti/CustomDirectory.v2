@@ -79,7 +79,7 @@ namespace CustomDirectory.v2
             if (!vacio)
             {
                 leyenda = GetCountrySearchCriteriaTitle(cadena_argentina, cadena_chile, cadena_ambos, final);
-                GetMenu(final, leyenda);
+                GetBottomMenu(final, leyenda);
             }
             else
                 final = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
@@ -148,7 +148,7 @@ namespace CustomDirectory.v2
             }
             return leyenda;
         }
-        private string GetMenu(string final, string leyenda)
+        private string GetBottomMenu(string final, string leyenda)
         {
             return "<CiscoIPPhoneDirectory>" + Environment.NewLine + final +
                 "<Prompt>" + leyenda + "</Prompt>" + Environment.NewLine +
