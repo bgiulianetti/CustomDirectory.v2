@@ -6,19 +6,6 @@
 *.user
 *.sln.docstates
 
-# Bundler de less
-!node_modules/
-
-#Minified CSS, JS
-app.min.js
-app.min.css
-
-# Build results
-src/Creapolis/[Dd]ebug/
-src/Creapolis.Test/[Dd]ebug/
-[Dd]ebugPublic/
-src/Creapolis/[Rr]elease/
-src/Creapolis.Test/[Rr]elease/
 x64/
 build/
 bld/
