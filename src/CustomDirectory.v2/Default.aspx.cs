@@ -16,85 +16,60 @@ namespace CustomDirectory.v2
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            #region QueryString
             string first = Request.QueryString["f"];
             string last = Request.QueryString["l"];
-            string pais = Request.QueryString["p"];
+            string country = Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
-            #endregion
 
             if (first == null) first = string.Empty;
             if (last == null) last = string.Empty;
-            if (pais == null) pais = string.Empty;
+            if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = string.Empty;
 
 
-            string cadena_chile = string.Empty;
-            string cadena_argentina = string.Empty;
-            string cadena_ambos = string.Empty;
-            bool vacio = false;
+            var ClDirectory = string.Empty;
+            var ArgDirectory = string.Empty;
+            var FullDirectory = string.Empty;
+            var countryMessage = string.Empty;
+            var notRecordsFound = false;
+            
 
-            if (pais == string.Empty)
+            if (country == string.Empty)
             {
-                cadena_chile = GetDirectory("chile", last, first, number, start.ToString());
-                cadena_argentina = GetDirectory("argentina", last, first, number, start.ToString());
-                cadena_ambos = cadena_chile + Environment.NewLine + cadena_argentina;
+                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+                FullDirectory = ConcatDirectories(new List<string> { ClDirectory, ArgDirectory });
+                countryMessage = "Records from all countries";
+            }
+            else if (string.Equals(country, "cl",StringComparison.InvariantCultureIgnoreCase))
+            {
+                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+                countryMessage = "Records from Chile";
+            }
+            else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
+            {
+                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+                countryMessage = "Records from Argentina";
             }
             else
             {
-                #region Evalua filtrado por Chile
-                bool igual_chile = true;
-                int b = 0;
-                string country = "chile";
-                while (igual_chile == true && b < pais.Length)
-                {
-                    if (pais[b].ToString() != country[b].ToString())
-                        igual_chile = false;
-                    b++;
-                }
-                #endregion
-
-                if (igual_chile == true || pais.ToLower() == "cl")
-                {
-                    cadena_chile = GetDirectory("chile", last, first, number, start.ToString());
-                }
-                else
-                {
-                    #region Evalua filtrado por argentina
-                    bool igual_arg = true;
-                    b = 0;
-                    country = "argentina";
-                    while (igual_arg == true && b < pais.Length)
-                    {
-                        if (pais[b].ToString().ToLower() != country[b].ToString())
-                            igual_arg = false;
-                        b++;
-                    }
-                    #endregion
-
-                    if (igual_arg)
-                    {
-                        cadena_argentina = GetDirectory("argentina", last, first, number, start.ToString());
-                    }
-                    else
-                        vacio = true;
-                }
+                notRecordsFound = true;
             }
 
-
-            string final = string.Empty, leyenda = string.Empty;
-            if (!vacio)
+            var finalXML = string.Empty;
+            if (!notRecordsFound)
             {
-                leyenda = GetCountrySearchCriteriaTitle(cadena_argentina, cadena_chile, cadena_ambos, final);
-                GetBottomMenu(final, leyenda);
+                finalXML = BuildFinalXML(FullDirectory, countryMessage);
             }
             else
-                final = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
+            {
+                finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
+            }
 
             Response.ContentType = "text/xml";
-            Response.Write(final);
+            Response.Write(finalXML);
         }
 
 
@@ -147,25 +122,25 @@ namespace CustomDirectory.v2
             }
             return leyenda;
         }
-        private string GetBottomMenu(string final, string leyenda)
+        private string BuildFinalXML(string FullDirectory, string countryMessage)
         {
-            return "<CiscoIPPhoneDirectory>" + Environment.NewLine + final +
-                "<Prompt>" + leyenda + "</Prompt>" + Environment.NewLine +
-                "<SoftKeyItem>" + Environment.NewLine +
-                    "<Name>Llamar</Name>" + Environment.NewLine +
-                    "<URL>SoftKey:Dial</URL>" + Environment.NewLine +
-                    "<Position>1</Position>" + Environment.NewLine +
-                "</SoftKeyItem>" + Environment.NewLine +
-                "<SoftKeyItem>" + Environment.NewLine +
-                    "<Name>Editar</Name>" + Environment.NewLine +
-                    "<URL>SoftKey:EditDial</URL>" + Environment.NewLine +
-                    "<Position>2</Position>" + Environment.NewLine +
-                "</SoftKeyItem>" + Environment.NewLine +
-                "<SoftKeyItem>" + Environment.NewLine +
-                    "<Name>Salir</Name>" + Environment.NewLine +
-                    "<URL>SoftKey:Exit</URL>" +
-                    "<Position>3</Position>" + Environment.NewLine +
-                "</SoftKeyItem>" + Environment.NewLine +
+            return "<CiscoIPPhoneDirectory>" + Environment.NewLine + FullDirectory +
+                    "<Prompt>" + countryMessage + "</Prompt>" + Environment.NewLine +
+                    "<SoftKeyItem>" + Environment.NewLine +
+                        "<Name>Llamar</Name>" + Environment.NewLine +
+                        "<URL>SoftKey:Dial</URL>" + Environment.NewLine +
+                        "<Position>1</Position>" + Environment.NewLine +
+                    "</SoftKeyItem>" + Environment.NewLine +
+                    "<SoftKeyItem>" + Environment.NewLine +
+                        "<Name>Editar</Name>" + Environment.NewLine +
+                        "<URL>SoftKey:EditDial</URL>" + Environment.NewLine +
+                        "<Position>2</Position>" + Environment.NewLine +
+                    "</SoftKeyItem>" + Environment.NewLine +
+                    "<SoftKeyItem>" + Environment.NewLine +
+                        "<Name>Salir</Name>" + Environment.NewLine +
+                        "<URL>SoftKey:Exit</URL>" +
+                        "<Position>3</Position>" + Environment.NewLine +
+                    "</SoftKeyItem>" + Environment.NewLine +
 
 
                 "<SoftKeyItem>" + Environment.NewLine +
@@ -210,6 +185,15 @@ namespace CustomDirectory.v2
                             Replace("<Telephone>", "<Telephone>" + prefix);
 
             return cadena;
+        }
+        private string ConcatDirectories(List<string> directories)
+        {
+            var directoryFull = string.Empty;
+            foreach (var item in directories)
+            {
+                directoryFull += Environment.NewLine + item;
+            }
+            return directoryFull;
         }
     }
 }
