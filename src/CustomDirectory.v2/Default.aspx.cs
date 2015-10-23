@@ -21,12 +21,14 @@ namespace CustomDirectory.v2
             string country = Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
+            string half = Request.QueryString["half"];
 
             if (first == null) first = string.Empty;
             if (last == null) last = string.Empty;
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = string.Empty;
+            if (half == null) half = string.Empty;
 
 
             var ClDirectory = string.Empty;
@@ -34,8 +36,8 @@ namespace CustomDirectory.v2
             var FullDirectory = string.Empty;
             var countryMessage = string.Empty;
             var notRecordsFound = false;
+            var finalXML = string.Empty;
             
-
             if (country == string.Empty)
             {
                 ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
@@ -58,7 +60,6 @@ namespace CustomDirectory.v2
                 notRecordsFound = true;
             }
 
-            var finalXML = string.Empty;
             if (!notRecordsFound)
             {
                 finalXML = BuildFinalXML(FullDirectory, countryMessage);
@@ -101,26 +102,6 @@ namespace CustomDirectory.v2
                 return System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_Argentina");
             else
                 return System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_Chile");
-        }
-        private string GetCountrySearchCriteriaTitle(string cadena_argentina, string cadena_chile, string cadena_ambos, string final)
-        {
-            string leyenda = string.Empty;
-            if (cadena_argentina != string.Empty && cadena_chile != string.Empty)
-            {
-                final = cadena_ambos;
-                leyenda = "Registros de Chile y Argentina";
-            }
-            else if (cadena_argentina != string.Empty && cadena_chile == string.Empty)
-            {
-                final = cadena_argentina;
-                leyenda = "Registros Argentina";
-            }
-            else if (cadena_argentina == string.Empty && cadena_chile != string.Empty)
-            {
-                final = cadena_chile;
-                leyenda = "Registros Chile";
-            }
-            return leyenda;
         }
         private string BuildFinalXML(string FullDirectory, string countryMessage)
         {
