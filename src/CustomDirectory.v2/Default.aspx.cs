@@ -40,7 +40,7 @@ namespace CustomDirectory.v2
                 StreamReader sr = new StreamReader(response.GetResponseStream());
                 cadena_chile = sr.ReadToEnd();
                 sr.Close();
-                cadena_chile = cadena_chile.Replace("<?xml version=\"1.0\"?>", "").Replace("<Telephone>", "<Telephone>*18").Replace("<CiscoIPPhoneDirectory>", "").
+                cadena_chile = cadena_chile.Replace("<?xml version=\"1.0\"?>", "").Replace("<Telephone>", "<Telephone>" + System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_Chile")).Replace("<CiscoIPPhoneDirectory>", "").
                     Replace("<Name>", "<Name>[CL] ");
 
                 for (int i = 0; i < cadena_chile.Length; i++)
