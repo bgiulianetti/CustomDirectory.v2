@@ -9,6 +9,7 @@ using System.Xml;
 
 using System.Net;
 using System.IO;
+using CustomDirectory.v2.Model;
 
 namespace CustomDirectory.v2
 {
@@ -30,47 +31,10 @@ namespace CustomDirectory.v2
             if (start == null) start = string.Empty;
             if (half == null) half = string.Empty;
 
-
-            var ClDirectory = string.Empty;
-            var ArgDirectory = string.Empty;
-            var FullDirectory = string.Empty;
-            var countryMessage = string.Empty;
-            var notRecordsFound = false;
-            var finalXML = string.Empty;
-            
-            if (country == string.Empty)
-            {
-                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-                FullDirectory = ConcatDirectories(new List<string> { ClDirectory, ArgDirectory });
-                countryMessage = "Records from all countries";
-            }
-            else if (string.Equals(country, "cl",StringComparison.InvariantCultureIgnoreCase))
-            {
-                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-                countryMessage = "Records from Chile";
-            }
-            else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-                countryMessage = "Records from Argentina";
-            }
-            else
-            {
-                notRecordsFound = true;
-            }
-
-            if (!notRecordsFound)
-            {
-                finalXML = BuildFinalXML(FullDirectory, countryMessage);
-            }
-            else
-            {
-                finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
-            }
+            var directories = GetDirectories(first, last, number, start, country);
 
             Response.ContentType = "text/xml";
-            Response.Write(finalXML);
+            //Response.Write(finalXML);
         }
 
 
@@ -85,7 +49,10 @@ namespace CustomDirectory.v2
 
             cadena = FixFormatDirectoryString(cadena, pais);
             cadena = DeleteBottomMenu(cadena);
-            cadena = SelectFirstNRecords(cadena, 16);
+            
+            
+            
+            //cadena = SelectFirstNRecords(cadena, 16);
             
             return cadena;
         }
@@ -175,6 +142,52 @@ namespace CustomDirectory.v2
                 directoryFull += Environment.NewLine + item;
             }
             return directoryFull;
+        }
+        private List<IPDirectory> GetDirectories(string first, string last, string number, string start, string country)
+        {
+            var ClDirectory = string.Empty;
+            var ArgDirectory = string.Empty;
+            var FullDirectory = string.Empty;
+            var countryMessage = string.Empty;
+            var notRecordsFound = false;
+            var finalXML = string.Empty;
+
+            if (country == string.Empty)
+            {
+                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+
+                var directories = new List<string>();
+                directories.Add(ClDirectory);
+                directories.Add(ArgDirectory);
+                
+                FullDirectory = ConcatDirectories(directories);
+                countryMessage = "Records from all countries";
+            }
+            else if (string.Equals(country, "cl", StringComparison.InvariantCultureIgnoreCase))
+            {
+                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+                countryMessage = "Records from Chile";
+            }
+            else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
+            {
+                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+                countryMessage = "Records from Argentina";
+            }
+            else
+            {
+                notRecordsFound = true;
+            }
+
+            if (!notRecordsFound)
+            {
+                finalXML = BuildFinalXML(FullDirectory, countryMessage);
+            }
+            else
+            {
+                finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
+            }
+            return null;
         }
     }
 }
