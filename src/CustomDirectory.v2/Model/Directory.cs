@@ -9,6 +9,7 @@ namespace CustomDirectory.v2.Model
     {
         public string Country { get; set; }
         public string Prefix { get; set; }
+        public int Count { get; set; }
         public List<IPPhoneDirectoryEntry> DirectoryEntries { get; set; }
     }
 

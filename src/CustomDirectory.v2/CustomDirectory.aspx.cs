@@ -40,11 +40,17 @@ namespace CustomDirectory.v2
 
         private string GetStringDirectory(string country, string last, string first, string number, string start)
         {
-            
 
-            
-            
-            //stringDirectory = FixFormatDirectoryString(stringDirectory, country);
+            //Corro por primera vez
+            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader sr = new StreamReader(response.GetResponseStream());
+            var stringDirectory = sr.ReadToEnd();
+            sr.Close();
+
+            stringDirectory = FixFormatDirectoryString(stringDirectory, country);
+            stringDirectory = DeleteBottomMenu(stringDirectory);
 
             return stringDirectory;
         }
@@ -54,10 +60,7 @@ namespace CustomDirectory.v2
         }
         private string GetPrefixByCountry(string country)
         {
-            if (string.Equals(country, "argentina", StringComparison.InvariantCultureIgnoreCase))
-                return System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_Argentina");
-            else
-                return System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_Chile");
+            return System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_" + country);
         }
         private string BuildFinalXML(string FullDirectory, string countryMessage)
         {
@@ -93,12 +96,12 @@ namespace CustomDirectory.v2
                 "</SoftKeyItem>" + Environment.NewLine +
                 "</CiscoIPPhoneDirectory>";
         }
-        private string DeleteBottomMenu(string cadena)
+        private string DeleteBottomMenu(string stringDirectory)
         {
-            for (int i = 0; i < cadena.Length; i++)
-                if (cadena[i].ToString() == "<" && cadena[i + 1].ToString() == "P")
-                    cadena = cadena.Substring(0, i);
-            return cadena;
+            for (int i = 0; i < stringDirectory.Length; i++)
+                if (stringDirectory[i].ToString() == "<" && stringDirectory[i + 1].ToString() == "P")
+                    stringDirectory = stringDirectory.Substring(0, i);
+            return stringDirectory;
         }
         private string SelectFirstNRecords(string cadena, int recordsCount)
         {
@@ -131,7 +134,7 @@ namespace CustomDirectory.v2
         }
         private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string start, string country)
         {
-            var IpPhoneDirectories = new List<IPPhoneDirectory>();
+            var IPPhoneDirectories = new List<IPPhoneDirectory>();
             var FullDirectory = string.Empty;
             var countryMessage = string.Empty;
             //var notRecordsFound = false;
@@ -144,6 +147,11 @@ namespace CustomDirectory.v2
                 var countries = GetAvailableCountries();
                 foreach (var countryItem in countries)
                 {
+                    var Directory = new IPPhoneDirectory();
+                    Directory.Country = countryItem.Value;
+                    Directory.Count = GetDirectoryCountRecords(country, last, first, number, start);
+                    Directory.Prefix = GetPrefixByCountry(country);
+
                     var stringdirectory = GetStringDirectory(countryItem.Value, last, first, number, start);
                 }
             }
@@ -194,7 +202,6 @@ namespace CustomDirectory.v2
             }
             return listCountries;
         }
-
         private int GetDirectoryCountRecords(string country, string last, string first, string number, string start)
         {
             //Corro por primera vez
@@ -225,9 +232,8 @@ namespace CustomDirectory.v2
             //    index++;
             //}
             int aux = 0;
-            return int.TryParse(recordsCount, out aux);
-
-
+            int.TryParse(recordsCount, out aux);
+            return aux;
         }
     }
 }
