@@ -8,7 +8,7 @@ namespace CustomDirectory.v2.Model
     public class IPDirectory
     {
         public string Country { get; set; }
-        public List<DirectoryEntry> DirectoryEntries { get; set; }
+        public List<IPDirectoryEntry> DirectoryEntries { get; set; }
     }
 
     public class IPDirectoryEntry
