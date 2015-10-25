@@ -40,27 +40,17 @@ namespace CustomDirectory.v2
 
         private string GetStringDirectory(string country, string last, string first, string number, string start)
         {
-            //Corro por primera vez
-            string url = GetDirectoryUrlByCountry("DirectoryUrl_" + country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader sr = new StreamReader(response.GetResponseStream());
-            var stringDirectory = sr.ReadToEnd();
-            sr.Close();
+            
 
-            //obtengo la cantidad de registros
-
-
-            stringDirectory = FixFormatDirectoryString(stringDirectory, country);
+            
+            
+            //stringDirectory = FixFormatDirectoryString(stringDirectory, country);
 
             return stringDirectory;
         }
         private string GetDirectoryUrlByCountry(string country)
         {
-            if (string.Equals(country, "argentina", StringComparison.InvariantCultureIgnoreCase))
-                return System.Configuration.ConfigurationManager.AppSettings.Get("DirectoryUrlArgentina");
-            else
-                return System.Configuration.ConfigurationManager.AppSettings.Get("DirectoryUrlChile");
+            return System.Configuration.ConfigurationManager.AppSettings.Get("DirectoryUrl_" + country);
         }
         private string GetPrefixByCountry(string country)
         {
@@ -203,6 +193,41 @@ namespace CustomDirectory.v2
                 listCountries.Add(arrCountriesNickname[i], arrCountries[i]);
             }
             return listCountries;
+        }
+
+        private int GetDirectoryCountRecords(string country, string last, string first, string number, string start)
+        {
+            //Corro por primera vez
+            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader sr = new StreamReader(response.GetResponseStream());
+            var stringDirectory = sr.ReadToEnd();
+            sr.Close();
+
+            //obtengo la cantidad de registros
+            var index = stringDirectory.IndexOf("</Prompt>");
+            while (stringDirectory[index] != ' ')
+                index--;
+
+            var recordsCount = string.Empty;
+            while (stringDirectory[index] != '<')
+            {
+                recordsCount += stringDirectory[index];
+                index++;
+            }
+
+            //index = stringDirectory.IndexOf(";start=");
+            //var startParameter = string.Empty;
+            //while (stringDirectory[index] != '<')
+            //{
+            //    startParameter += stringDirectory[index];
+            //    index++;
+            //}
+            int aux = 0;
+            return int.TryParse(recordsCount, out aux);
+
+
         }
     }
 }
