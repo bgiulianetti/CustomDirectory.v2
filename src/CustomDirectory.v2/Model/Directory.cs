@@ -5,13 +5,14 @@ using System.Web;
 
 namespace CustomDirectory.v2.Model
 {
-    public class IPDirectory
+    public class IPPhoneDirectory
     {
         public string Country { get; set; }
-        public List<IPDirectoryEntry> DirectoryEntries { get; set; }
+        public string Prefix { get; set; }
+        public List<IPPhoneDirectoryEntry> DirectoryEntries { get; set; }
     }
 
-    public class IPDirectoryEntry
+    public class IPPhoneDirectoryEntry
     {
         public string Name { get; set; }
         public string Telephone { get; set; }

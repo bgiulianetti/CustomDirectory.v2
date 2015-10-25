@@ -10,6 +10,6 @@
 namespace CustomDirectory.v2 {
     
     
-    public partial class _Default {
+    public partial class _CustomDirecotory {
     }
 }

@@ -13,7 +13,7 @@ using CustomDirectory.v2.Model;
 
 namespace CustomDirectory.v2
 {
-    public partial class _Default : System.Web.UI.Page
+    public partial class _CustomDirecotory : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -38,23 +38,22 @@ namespace CustomDirectory.v2
         }
 
 
-        private string GetDirectory(string pais, string last, string first, string number, string start)
+        private string GetStringDirectory(string country, string last, string first, string number, string start)
         {
-            string url =GetDirectoryUrlByCountry(pais) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            //Corro por primera vez
+            string url = GetDirectoryUrlByCountry("DirectoryUrl_" + country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader sr = new StreamReader(response.GetResponseStream());
-            string cadena = sr.ReadToEnd();
+            var stringDirectory = sr.ReadToEnd();
             sr.Close();
 
-            cadena = FixFormatDirectoryString(cadena, pais);
-            cadena = DeleteBottomMenu(cadena);
-            
-            
-            
-            //cadena = SelectFirstNRecords(cadena, 16);
-            
-            return cadena;
+            //obtengo la cantidad de registros
+
+
+            stringDirectory = FixFormatDirectoryString(stringDirectory, country);
+
+            return stringDirectory;
         }
         private string GetDirectoryUrlByCountry(string country)
         {
@@ -123,16 +122,13 @@ namespace CustomDirectory.v2
             }
             return cadena;
         }
-        private string FixFormatDirectoryString(string cadena, string pais)
+        private string FixFormatDirectoryString(string stringDirectory, string country)
         {
-            string prefix = GetPrefixByCountry(pais);
-            cadena = cadena.Replace("<?xml version=\"1.0\"?>", "").
-                            Replace("<CiscoIPPhoneDirectory>", "").
-                            Replace("<Name>", "<Name>[ARG] ").
-                            Replace("Garc�a", "Garcia").
-                            Replace("<Telephone>", "<Telephone>" + prefix);
+            stringDirectory = stringDirectory.Replace("<?xml version=\"1.0\"?>", "").
+                              Replace("<CiscoIPPhoneDirectory>", "").
+                              Replace("Garc�a", "Garcia");
 
-            return cadena;
+            return stringDirectory;
         }
         private string ConcatDirectories(List<string> directories)
         {
@@ -143,51 +139,70 @@ namespace CustomDirectory.v2
             }
             return directoryFull;
         }
-        private List<IPDirectory> GetDirectories(string first, string last, string number, string start, string country)
+        private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string start, string country)
         {
-            var ClDirectory = string.Empty;
-            var ArgDirectory = string.Empty;
+            var IpPhoneDirectories = new List<IPPhoneDirectory>();
             var FullDirectory = string.Empty;
             var countryMessage = string.Empty;
-            var notRecordsFound = false;
+            //var notRecordsFound = false;
             var finalXML = string.Empty;
 
             if (country == string.Empty)
             {
-                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
 
-                var directories = new List<string>();
-                directories.Add(ClDirectory);
-                directories.Add(ArgDirectory);
+
+                var countries = GetAvailableCountries();
+                foreach (var countryItem in countries)
+                {
+                    var stringdirectory = GetStringDirectory(countryItem.Value, last, first, number, start);
+                }
+            }
+
+            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+
+            //    var directories = new List<string>();
+            //    directories.Add(ClDirectory);
+            //    directories.Add(ArgDirectory);
                 
-                FullDirectory = ConcatDirectories(directories);
-                countryMessage = "Records from all countries";
-            }
-            else if (string.Equals(country, "cl", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-                countryMessage = "Records from Chile";
-            }
-            else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-                countryMessage = "Records from Argentina";
-            }
-            else
-            {
-                notRecordsFound = true;
-            }
+            //    FullDirectory = ConcatDirectories(directories);
+            //    countryMessage = "Records from all countries";
+            //}
+            //else if (string.Equals(country, "cl", StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+            //    countryMessage = "Records from Chile";
+            //}
+            //else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+            //    countryMessage = "Records from Argentina";
+            //}
+            //else
+            //{
+            //    notRecordsFound = true;
+            //}
 
-            if (!notRecordsFound)
-            {
-                finalXML = BuildFinalXML(FullDirectory, countryMessage);
-            }
-            else
-            {
-                finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
-            }
+            //if (!notRecordsFound)
+            //{
+            //    finalXML = BuildFinalXML(FullDirectory, countryMessage);
+            //}
+            //else
+            //{
+            //    finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
+            //}
             return null;
+        }
+        private Dictionary<string, string> GetAvailableCountries()
+        {
+            var listCountries = new Dictionary<string, string>();
+            var arrCountries = System.Configuration.ConfigurationManager.AppSettings.Get("Countries").Split('/');
+            var arrCountriesNickname = System.Configuration.ConfigurationManager.AppSettings.Get("Countries_Nickname").Split('/');
+            for (int i = 0; i < arrCountries.Count(); i++)
+            {
+                listCountries.Add(arrCountriesNickname[i], arrCountries[i]);
+            }
+            return listCountries;
         }
     }
 }

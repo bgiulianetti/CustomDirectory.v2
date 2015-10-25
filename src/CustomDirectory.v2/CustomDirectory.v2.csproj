@@ -53,16 +53,16 @@
     <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Default.aspx" />
+    <Content Include="CustomDirectory.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Default.aspx.cs">
+    <Compile Include="CustomDirectory.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
-      <DependentUpon>Default.aspx</DependentUpon>
+      <DependentUpon>CustomDirectory.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Default.aspx.designer.cs">
-      <DependentUpon>Default.aspx</DependentUpon>
+    <Compile Include="CustomDirectory.aspx.designer.cs">
+      <DependentUpon>CustomDirectory.aspx</DependentUpon>
     </Compile>
     <Compile Include="Model\Directory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
