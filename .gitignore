@@ -9,8 +9,7 @@
 x64/
 build/
 bld/
-src/Creapolis/[Bb]in/
-src/Creapolis.Test/[Bb]in/
+src/CustomDirectory.v2/[Bb]in/
 [Oo]bj/
 
 # MSTest test Results
@@ -170,5 +169,5 @@ UpgradeLog*.htm
 FakesAssemblies/
 
 #Building Pack
-src/Creapolis/bin/
-src/Creapolis/obj/
+src/CustomDirectory.v2/bin/
+src/CustomDirectory.v2/obj/
