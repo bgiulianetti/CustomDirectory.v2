@@ -149,10 +149,21 @@ namespace CustomDirectory.v2
                 {
                     var Directory = new IPPhoneDirectory();
                     Directory.Country = countryItem.Value;
-                    Directory.Count = GetDirectoryCountRecords(country, last, first, number, start);
-                    Directory.Prefix = GetPrefixByCountry(country);
+                    Directory.Count = GetDirectoryCountRecords(Directory.Country, last, first, number, start);
+                    Directory.Prefix = GetPrefixByCountry(Directory.Country);
 
-                    var stringdirectory = GetStringDirectory(countryItem.Value, last, first, number, start);
+
+                    var stringdirectory = string.Empty;
+                    int pages = 0;
+                    var pagesDouble = Directory.Count / 30;
+                    //int.TryParse((pagesDouble).ToString(), out pages);
+
+                    //var pages = Math.Ceiling((double));
+                    for (int i = 0; i < (int)pages; i++)
+                    {
+
+                    }
+                    GetStringDirectory(countryItem.Value, last, first, number, start);
                 }
             }
 
