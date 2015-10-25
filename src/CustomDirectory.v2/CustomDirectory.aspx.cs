@@ -22,26 +22,24 @@ namespace CustomDirectory.v2
             string country = Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
-            string half = Request.QueryString["half"];
+            //string half = Request.QueryString["half"];
 
             if (first == null) first = string.Empty;
             if (last == null) last = string.Empty;
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = string.Empty;
-            if (half == null) half = string.Empty;
+            //if (half == null) half = string.Empty;
 
-            var directories = GetDirectories(first, last, number, start, country);
+            var directories = GetDirectories(first, last, number, country);
 
             Response.ContentType = "text/xml";
             //Response.Write(finalXML);
         }
 
 
-        private string GetStringDirectory(string country, string last, string first, string number, string start)
+        private string GetStringDirectory(string first, string last, string number, string country, string start)
         {
-
-            //Corro por primera vez
             string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -51,6 +49,9 @@ namespace CustomDirectory.v2
 
             stringDirectory = FixFormatDirectoryString(stringDirectory, country);
             stringDirectory = DeleteBottomMenu(stringDirectory);
+
+            stringDirectory = stringDirectory.Replace("<DirectoryEntry>", "#");
+            stringDirectory = stringDirectory.Replace("</DirectoryEntry>", "");
 
             return stringDirectory;
         }
@@ -132,38 +133,40 @@ namespace CustomDirectory.v2
             }
             return directoryFull;
         }
-        private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string start, string country)
+        private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string country)
         {
             var IPPhoneDirectories = new List<IPPhoneDirectory>();
-            var FullDirectory = string.Empty;
-            var countryMessage = string.Empty;
+            //var FullDirectory = string.Empty;
+            //var countryMessage = string.Empty;
             //var notRecordsFound = false;
-            var finalXML = string.Empty;
+            //var finalXML = string.Empty;
 
             if (country == string.Empty)
             {
-
-
                 var countries = GetAvailableCountries();
                 foreach (var countryItem in countries)
                 {
                     var Directory = new IPPhoneDirectory();
+                    var entriesList = new List<IPPhoneDirectoryEntry>();
                     Directory.Country = countryItem.Value;
-                    Directory.Count = GetDirectoryCountRecords(Directory.Country, last, first, number, start);
+                    Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country);
                     Directory.Prefix = GetPrefixByCountry(Directory.Country);
 
 
                     var stringdirectory = string.Empty;
-                    int pages = 0;
-                    var pagesDouble = Directory.Count / 30;
-                    //int.TryParse((pagesDouble).ToString(), out pages);
-
-                    //var pages = Math.Ceiling((double));
-                    for (int i = 0; i < (int)pages; i++)
+                    var pagesWithComa = (double)Directory.EntriesCount / 2;
+                    var pagesRounded = Math.Ceiling(pagesWithComa);
+                    var start = 1;
+                    for (int i = 0; i < pagesRounded; i++)
                     {
-
+                        entriesList.AddRange(GetEntriesList(first, last, number, Directory.Country, start.ToString()));
+                        start += 31;
                     }
-                    GetStringDirectory(countryItem.Value, last, first, number, start);
+                    Directory.DirectoryEntries = entriesList;
+                    
+                    
+                    
+                    //GetStringDirectory(countryItem.Value, last, first, number, start);
                 }
             }
 
@@ -213,10 +216,10 @@ namespace CustomDirectory.v2
             }
             return listCountries;
         }
-        private int GetDirectoryCountRecords(string country, string last, string first, string number, string start)
+        private int GetDirectoryEntriesCount(string first, string last, string number, string country)
         {
             //Corro por primera vez
-            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number;// +"&start=" + start;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader sr = new StreamReader(response.GetResponseStream());
@@ -245,6 +248,32 @@ namespace CustomDirectory.v2
             int aux = 0;
             int.TryParse(recordsCount, out aux);
             return aux;
+        }
+
+        private List<IPPhoneDirectoryEntry> GetEntriesList(string first, string last, string number, string country, string start)
+        {
+            var list = new List<IPPhoneDirectoryEntry>();
+            var stringEntries = GetStringDirectory(first, last, number, country, start);
+            var arrayEntries = stringEntries.Split('#');
+            foreach (var entry in arrayEntries)
+            {
+                if (entry.Contains("<Name>"))
+                {
+                    var entryFixed = entry.Replace("<Name>", string.Empty)
+                                          .Replace("</Name>", "#")
+                                          .Replace("</Telephone>", string.Empty)
+                                          .Replace("<Telephone>", string.Empty);
+
+                    var arrayEntry = entryFixed.Split('#');
+
+                    var IPEntry = new IPPhoneDirectoryEntry();
+
+                    IPEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                    IPEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+                    list.Add(IPEntry);
+                }
+            }
+            return list;
         }
     }
 }
