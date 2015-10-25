@@ -135,11 +135,11 @@ namespace CustomDirectory.v2
         }
         private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string country)
         {
-            var IPPhoneDirectories = new List<IPPhoneDirectory>();
             //var FullDirectory = string.Empty;
             //var countryMessage = string.Empty;
             //var notRecordsFound = false;
             //var finalXML = string.Empty;
+            var IPPhoneDirectories = new List<IPPhoneDirectory>();
 
             if (country == string.Empty)
             {
@@ -249,7 +249,6 @@ namespace CustomDirectory.v2
             int.TryParse(recordsCount, out aux);
             return aux;
         }
-
         private List<IPPhoneDirectoryEntry> GetEntriesList(string first, string last, string number, string country, string start)
         {
             var list = new List<IPPhoneDirectoryEntry>();
