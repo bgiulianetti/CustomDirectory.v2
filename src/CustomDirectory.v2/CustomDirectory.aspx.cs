@@ -40,10 +40,10 @@ namespace CustomDirectory.v2
 
         private string GetStringDirectory(string first, string last, string number, string country, string start)
         {
-            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader sr = new StreamReader(response.GetResponseStream());
+            var url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            var response = (HttpWebResponse)request.GetResponse();
+            var sr = new StreamReader(response.GetResponseStream());
             var stringDirectory = sr.ReadToEnd();
             sr.Close();
 
