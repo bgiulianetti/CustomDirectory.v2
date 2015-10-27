@@ -22,16 +22,14 @@ namespace CustomDirectory.v2
             string country = Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
-            //string half = Request.QueryString["half"];
 
             if (first == null) first = string.Empty;
             if (last == null) last = string.Empty;
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = string.Empty;
-            //if (half == null) half = string.Empty;
 
-            var directories = GetDirectories(first, last, number, country);
+            var directories = GetDirectories(first, last, number, country, start);
 
             Response.ContentType = "text/xml";
             //Response.Write(finalXML);
@@ -133,42 +131,22 @@ namespace CustomDirectory.v2
             }
             return directoryFull;
         }
-        private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string country)
+        private List<IPPhoneDirectory> GetDirectories(string first, string last, string number, string country, string start)
         {
-            //var FullDirectory = string.Empty;
-            //var countryMessage = string.Empty;
-            //var notRecordsFound = false;
-            //var finalXML = string.Empty;
             var IPPhoneDirectories = new List<IPPhoneDirectory>();
-
+            var countries = GetAvailableCountries();
             if (country == string.Empty)
             {
-                var countries = GetAvailableCountries();
                 foreach (var countryItem in countries)
-                {
-                    var Directory = new IPPhoneDirectory();
-                    var entriesList = new List<IPPhoneDirectoryEntry>();
-                    Directory.Country = countryItem.Value;
-                    Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country);
-                    Directory.Prefix = GetPrefixByCountry(Directory.Country);
-
-
-                    var stringdirectory = string.Empty;
-                    var pagesWithComa = (double)Directory.EntriesCount / 2;
-                    var pagesRounded = Math.Ceiling(pagesWithComa);
-                    var start = 1;
-                    for (int i = 0; i < pagesRounded; i++)
-                    {
-                        entriesList.AddRange(GetEntriesList(first, last, number, Directory.Country, start.ToString()));
-                        start += 31;
-                    }
-                    Directory.DirectoryEntries = entriesList;
-                    
-                    
-                    
-                    //GetStringDirectory(countryItem.Value, last, first, number, start);
-                }
+                    IPPhoneDirectories.Add(GetSingleDirectory(first, last, number, countryItem.Value, start));
             }
+            else
+            {
+
+            }
+
+            return IPPhoneDirectories;
+            //if(country == "")
 
             //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
             //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
@@ -176,7 +154,7 @@ namespace CustomDirectory.v2
             //    var directories = new List<string>();
             //    directories.Add(ClDirectory);
             //    directories.Add(ArgDirectory);
-                
+
             //    FullDirectory = ConcatDirectories(directories);
             //    countryMessage = "Records from all countries";
             //}
@@ -203,7 +181,6 @@ namespace CustomDirectory.v2
             //{
             //    finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
             //}
-            return null;
         }
         private Dictionary<string, string> GetAvailableCountries()
         {
@@ -273,6 +250,21 @@ namespace CustomDirectory.v2
                 }
             }
             return list;
+        }
+
+        private IPPhoneDirectory GetSingleDirectory(string first, string last, string number, string country, string start)
+        {
+            var Directory = new IPPhoneDirectory();
+            var entriesList = new List<IPPhoneDirectoryEntry>();
+
+            Directory.Country = country;
+            Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country);
+            Directory.Prefix = GetPrefixByCountry(Directory.Country);
+
+            entriesList.AddRange(GetEntriesList(first, last, number, Directory.Country, start));
+            Directory.DirectoryEntries = entriesList;
+
+            return Directory;
         }
     }
 }
