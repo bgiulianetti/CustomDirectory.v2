@@ -32,9 +32,13 @@ namespace CustomDirectory.v2
             if (last == null) last = string.Empty;
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
-            if (start == null) start = string.Empty;
+            if (start == null) start = "1";
             if (page == null) page = "0";
 
+
+            //Borrar despeus
+            page = "2";
+            //
             var directories = new List<IPPhoneDirectory>();
             var countryValidado = string.Empty;
             if (country != string.Empty)
@@ -53,7 +57,7 @@ namespace CustomDirectory.v2
 
 
             int intPage = Int32.Parse(page);
-            if (intPage > 1)
+            if (intPage >= 1 && ((intPage - 1) * 31 + 31) >= directoryListOrdered.Count)
             {
                 //obtener mas registros
                 directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
@@ -65,6 +69,9 @@ namespace CustomDirectory.v2
             }
 
             var selection = GetEntriesByPage(directoryListOrdered, intPage);
+
+
+
             var stringXMLOrderedEntries = CovertEntriesToString(selection);
 
             xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
@@ -80,7 +87,7 @@ namespace CustomDirectory.v2
         private List<IPPhoneDirectoryEntry> GetEntriesByPage(List<IPPhoneDirectoryEntry> listEntries, int page)
         {
             var list = new List<IPPhoneDirectoryEntry>();
-            for (int i = page * 31; i < page + 31; i++)
+            for (int i = page * 31; i < (page*31) + 31; i++)
                 list.Add(listEntries[i]);
 
             return list;
@@ -272,9 +279,9 @@ namespace CustomDirectory.v2
             }
             return listCountries;
         }
-        private int GetDirectoryEntriesCount(string first, string last, string number, string country)
+        private int GetDirectoryEntriesCount(string first, string last, string number, string country, string start)
         {
-            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number;// +"&start=" + start;
+            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader sr = new StreamReader(response.GetResponseStream());
@@ -334,7 +341,7 @@ namespace CustomDirectory.v2
             var entriesList = new List<IPPhoneDirectoryEntry>();
 
             Directory.Country = country;
-            Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country);
+            Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country, start);
             Directory.Prefix = GetPrefixByCountry(Directory.Country);
 
             entriesList.AddRange(GetEntriesList(first, last, number, Directory.Country, start));
