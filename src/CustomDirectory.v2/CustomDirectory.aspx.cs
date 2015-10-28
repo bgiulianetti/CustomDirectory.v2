@@ -33,7 +33,7 @@ namespace CustomDirectory.v2
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = string.Empty;
-            if (page == null) page = "1";
+            if (page == null) page = "0";
 
             var directories = new List<IPPhoneDirectory>();
             var countryValidado = string.Empty;
@@ -52,7 +52,8 @@ namespace CustomDirectory.v2
 	        }
 
 
-            if (Int32.Parse(page) + 31 > directoryListOrdered.Count)
+            int intPage = Int32.Parse(page);
+            if (intPage > 1)
             {
                 //obtener mas registros
                 directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
@@ -63,7 +64,7 @@ namespace CustomDirectory.v2
                 }
             }
 
-            var selection = GetEntriesByPage(directoryListOrdered, page);
+            var selection = GetEntriesByPage(directoryListOrdered, intPage);
             var stringXMLOrderedEntries = CovertEntriesToString(selection);
 
             xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
@@ -76,11 +77,10 @@ namespace CustomDirectory.v2
             Response.Write(xmlOutput);
         }
 
-        private List<IPPhoneDirectoryEntry> GetEntriesByPage(List<IPPhoneDirectoryEntry> listEntries, string page)
+        private List<IPPhoneDirectoryEntry> GetEntriesByPage(List<IPPhoneDirectoryEntry> listEntries, int page)
         {
             var list = new List<IPPhoneDirectoryEntry>();
-            var intPage = Int32.Parse(page);
-            for (int i = intPage - 1; i < intPage + 31; i++)
+            for (int i = page * 31; i < page + 31; i++)
                 list.Add(listEntries[i]);
 
             return list;
