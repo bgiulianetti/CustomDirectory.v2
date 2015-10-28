@@ -17,18 +17,23 @@ namespace CustomDirectory.v2
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+            }
             var xmlOutput = string.Empty;
             string first = Request.QueryString["f"];
             string last = Request.QueryString["l"];
             string country = Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
+            string page = Request.QueryString["page"];
 
             if (first == null) first = string.Empty;
             if (last == null) last = string.Empty;
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = string.Empty;
+            if (page == null) page = "1";
 
             var directories = new List<IPPhoneDirectory>();
             var countryValidado = string.Empty;
@@ -43,15 +48,43 @@ namespace CustomDirectory.v2
             foreach (var dir in directories)
 	        {
                 var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
-		        directoryListOrdered.AddRange(dir.DirectoryEntries);
+                directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
 	        }
 
-            var stringXMLOrderedEntries = CovertEntriesToString(directoryListOrdered);
+
+            if (Int32.Parse(page) + 31 > directoryListOrdered.Count)
+            {
+                //obtener mas registros
+                directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
+                foreach (var dir in directories)
+                {
+                    var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
+                    directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
+                }
+            }
+
+            var selection = GetEntriesByPage(directoryListOrdered, page);
+            var stringXMLOrderedEntries = CovertEntriesToString(selection);
+
+            xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
+                        "<CiscoIPPhoneDirectory>" + Environment.NewLine +
+                        stringXMLOrderedEntries +   Environment.NewLine +
+                        "</CiscoIPPhoneDirectory>";
+                        
 
             Response.ContentType = "text/xml";
             Response.Write(xmlOutput);
         }
 
+        private List<IPPhoneDirectoryEntry> GetEntriesByPage(List<IPPhoneDirectoryEntry> listEntries, string page)
+        {
+            var list = new List<IPPhoneDirectoryEntry>();
+            var intPage = Int32.Parse(page);
+            for (int i = intPage - 1; i < intPage + 31; i++)
+                list.Add(listEntries[i]);
+
+            return list;
+        }
         private IPPhoneDirectory AddCountryCodeToDirectoryEntries(IPPhoneDirectory dir)
         {
             var dirWithCountryCode = new IPPhoneDirectory();
@@ -319,7 +352,6 @@ namespace CustomDirectory.v2
             }
             return string.Empty;
         }
-
         private string GetCountryCodeByName(string countryName)
         {
             var countries = GetAvailableCountries();
@@ -330,7 +362,5 @@ namespace CustomDirectory.v2
             }
             return string.Empty;
         }
-
-
     }
 }
