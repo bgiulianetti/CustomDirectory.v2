@@ -17,9 +17,7 @@ namespace CustomDirectory.v2
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-            }
+            #region QueryStrings 
             var xmlOutput = string.Empty;
             string first = Request.QueryString["f"];
             string last = Request.QueryString["l"];
@@ -33,12 +31,9 @@ namespace CustomDirectory.v2
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = "1";
-            if (page == null) page = "0";
+            if (page == null) page = "2";
+            #endregion
 
-
-            //Borrar despeus
-            page = "2";
-            //
             var directories = new List<IPPhoneDirectory>();
             var countryValidado = string.Empty;
             if (country != string.Empty)
@@ -281,10 +276,10 @@ namespace CustomDirectory.v2
         }
         private int GetDirectoryEntriesCount(string first, string last, string number, string country, string start)
         {
-            string url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader sr = new StreamReader(response.GetResponseStream());
+            var url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            var response = (HttpWebResponse)request.GetResponse();
+            var sr = new StreamReader(response.GetResponseStream());
             var stringDirectory = sr.ReadToEnd();
             sr.Close();
 
@@ -310,7 +305,7 @@ namespace CustomDirectory.v2
             int.TryParse(recordsCount, out aux);
             return aux;
         }
-        private List<IPPhoneDirectoryEntry> GetEntriesList(string first, string last, string number, string country, string start)
+        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesList(string first, string last, string number, string country, string start)
         {
             var list = new List<IPPhoneDirectoryEntry>();
             var stringEntries = GetStringDirectory(first, last, number, country, start);
@@ -344,7 +339,7 @@ namespace CustomDirectory.v2
             Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country, start);
             Directory.Prefix = GetPrefixByCountry(Directory.Country);
 
-            entriesList.AddRange(GetEntriesList(first, last, number, Directory.Country, start));
+            entriesList.AddRange(GetDirectoryEntriesList(first, last, number, Directory.Country, start));
             Directory.DirectoryEntries = entriesList;
 
             return Directory;
