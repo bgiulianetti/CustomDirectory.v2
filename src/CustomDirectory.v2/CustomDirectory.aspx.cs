@@ -31,7 +31,7 @@ namespace CustomDirectory.v2
             if (country == null) country = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = "1";
-            if (page == null) page = "2";
+            if (page == null) page = "0";
             #endregion
 
             var directories = new List<IPPhoneDirectory>();
@@ -40,39 +40,47 @@ namespace CustomDirectory.v2
             {
                 countryValidado = GetCountryNameByCode(country);
                 if (countryValidado == string.Empty)
-                    xmlOutput = "Invalid Country";
+                    xmlOutput = "<Text>Invalid Country</Text>";
+                else
+                {
+                    var directory = GetStringDirectory(first, last, number, country, start);
+                }
             }
-            directories = GetDirectories(first, last, number, countryValidado, start);
-            var directoryListOrdered = new List<IPPhoneDirectoryEntry>();
-            foreach (var dir in directories)
-	        {
-                var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
-                directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
-	        }
-
-
-            int intPage = Int32.Parse(page);
-            if (intPage >= 1 && ((intPage - 1) * 31 + 31) >= directoryListOrdered.Count)
+            else
             {
-                //obtener mas registros
-                directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
+                directories = GetDirectories(first, last, number, countryValidado, start);
+                var directoryListOrdered = new List<IPPhoneDirectoryEntry>();
                 foreach (var dir in directories)
                 {
                     var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
                     directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
                 }
+
+
+                int intPage = Int32.Parse(page);
+                if (intPage >= 1 && ((intPage - 1) * 31 + 31) >= directoryListOrdered.Count)
+                {
+                    //obtener mas registros
+                    directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
+                    foreach (var dir in directories)
+                    {
+                        var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
+                        directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
+                    }
+                }
+
+                var selection = GetEntriesByPage(directoryListOrdered, intPage);
+
+
+
+                var stringXMLOrderedEntries = CovertEntriesToString(selection);
+
+                xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
+                            "<CiscoIPPhoneDirectory>" + Environment.NewLine +
+                            stringXMLOrderedEntries + Environment.NewLine +
+                            "</CiscoIPPhoneDirectory>";
             }
 
-            var selection = GetEntriesByPage(directoryListOrdered, intPage);
-
-
-
-            var stringXMLOrderedEntries = CovertEntriesToString(selection);
-
-            xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
-                        "<CiscoIPPhoneDirectory>" + Environment.NewLine +
-                        stringXMLOrderedEntries +   Environment.NewLine +
-                        "</CiscoIPPhoneDirectory>";
                         
 
             Response.ContentType = "text/xml";
@@ -127,11 +135,11 @@ namespace CustomDirectory.v2
             var stringDirectory = sr.ReadToEnd();
             sr.Close();
 
-            stringDirectory = FixFormatDirectoryString(stringDirectory, country);
-            stringDirectory = DeleteBottomMenu(stringDirectory);
+            //stringDirectory = FixFormatDirectoryString(stringDirectory, country);
+            //stringDirectory = DeleteBottomMenu(stringDirectory);
 
-            stringDirectory = stringDirectory.Replace("<DirectoryEntry>", "#");
-            stringDirectory = stringDirectory.Replace("</DirectoryEntry>", "");
+            //stringDirectory = stringDirectory.Replace("<DirectoryEntry>", "#");
+            //stringDirectory = stringDirectory.Replace("</DirectoryEntry>", "");
 
             return stringDirectory;
         }
