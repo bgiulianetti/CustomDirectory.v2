@@ -40,10 +40,16 @@ namespace CustomDirectory.v2
             {
                 countryValidado = GetCountryNameByCode(country);
                 if (countryValidado == string.Empty)
+                {
                     xmlOutput = "<Text>Invalid Country</Text>";
+                }
                 else
                 {
-                    var directory = GetStringDirectory(first, last, number, country, start);
+                    var StringDirectory = GetStringDirectory(first, last, number, country, start);
+                    StringDirectory = StringDirectory.Replace("<Name>", "<Name>" + country.ToUpper())
+                                                     .Replace("<Prompt>Records", "<Prompt>Contactos")
+                                                     .Replace(" to ", " a ")
+                                                     .Replace(" of ", " de ");
                 }
             }
             else
