@@ -180,13 +180,13 @@ namespace CustomDirectory.v2
 
                 "<SoftKeyItem>" + Environment.NewLine +
                 "<Name>Next</Name>" + Environment.NewLine +
-                "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("localhost") + "?start=32</URL>" + Environment.NewLine +
+                "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlAspx") + "?start=32</URL>" + Environment.NewLine +
                 "<Position>4</Position>" + Environment.NewLine +
                 "</SoftKeyItem>" + Environment.NewLine +
 
                 "<SoftKeyItem>" + Environment.NewLine +
                 "<Name>Search</Name>" + Environment.NewLine +
-                "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("localhost") + "</URL>" + Environment.NewLine +
+                "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlAspx") + "</URL>" + Environment.NewLine +
                 "<Position>5</Position>" + Environment.NewLine +
                 "</SoftKeyItem>" + Environment.NewLine +
                 "</CiscoIPPhoneDirectory>";
