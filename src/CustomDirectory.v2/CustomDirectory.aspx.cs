@@ -23,7 +23,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             string first = Request.QueryString["f"];
             string last = Request.QueryString["l"];
-            string countryCode = "arg";// Request.QueryString["p"];
+            string countryCode = "cl";// Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
             string page = Request.QueryString["page"];
@@ -405,9 +405,9 @@ namespace CustomDirectory.v2
         private string FixFormatForSingleCountry(string stringDirectory, string countryCode, string countryName, string first, string last, string number, string start)
         {
             return stringDirectory.Replace("<Name>", "<Name>[" + countryCode.ToUpper() + "] ")
-                                  .Replace("<Prompt>Records", "<Prompt>Contactos")
-                                  .Replace(" to ", " a ")
-                                  .Replace(" of ", " de ")
+                                  //.Replace("<Prompt>Records", "<Prompt>Contactos")
+                                  //.Replace(" to ", " a ")
+                                  //.Replace(" of ", " de ")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Dial", "<Name>Dial")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Search", "<Name>Search")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Exit", "<Name>Exit")
@@ -417,7 +417,29 @@ namespace CustomDirectory.v2
                                            "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory") + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
                                   .Replace(("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
                                             "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing") + "</URL>")
-                                  .Replace("<?xml version=\"1.0\"?>", "");
+                                  .Replace("<?xml version=\"1.0\"?>", "")
+                                  .Replace("Garc�a", "García")
+                                  .Replace("A�on", "Añon")
+                                  .Replace("R�o", "Río")
+                                  .Replace("Reuni�n", "Reunión")
+                                  .Replace("Fandi�o", "Fandiño")
+                                  .Replace("Hern�n", "Hernán")
+                                  .Replace("Larra�aga", "Larrañaga")
+                                  .Replace("Franc�s", "Francés")
+                                  .Replace("Mej�a", "Mejía")
+                                  .Replace("M�ximo", "Máximo")
+                                  .Replace("Espi�o", "Espiño")
+                                  .Replace("Nu�ez", "Nuñez")
+                                  .Replace("Iguaz�", "Iguazú")
+                                  .Replace("Tr�fico", "Tráfico")
+                                  .Replace("Tucum�n", "Tucumán")
+                                  .Replace("Jass�n", "Jassén")
+                                  .Replace("Cama�o", "Camaño")
+                                  .Replace("Mart�n", "Martín")
+                                  .Replace("Emisi�n", "Emisión")
+                                  .Replace("Fari�a", "Fariña")
+                                  .Replace("Malarg�e", "Malargüe")
+                                  .Replace("Mar�a", "María");
         }
 
         private HttpWebRequest InitializeWebRequest()
