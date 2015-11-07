@@ -395,5 +395,10 @@ namespace CustomDirectory.v2
                                             "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing") + "</URL>")
                                   .Replace("<?xml version=\"1.0\"?>", "");
         }
+
+        private HttpWebRequest InitializeWebRequest()
+        {
+
+        }
     }
 }
