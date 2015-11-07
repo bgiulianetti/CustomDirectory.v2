@@ -21,70 +21,66 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             string first = Request.QueryString["f"];
             string last = Request.QueryString["l"];
-            string country = Request.QueryString["p"];
+            string countryCode = "arg";// Request.QueryString["p"];
             string number = Request.QueryString["n"];
             string start = Request.QueryString["start"];
             string page = Request.QueryString["page"];
 
             if (first == null) first = string.Empty;
             if (last == null) last = string.Empty;
-            if (country == null) country = string.Empty;
+            if (countryCode == null) countryCode = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = "1";
             if (page == null) page = "0";
             #endregion
 
             var directories = new List<IPPhoneDirectory>();
-            var countryValidado = string.Empty;
-            if (country != string.Empty)
+            if (countryCode != string.Empty)
             {
-                countryValidado = GetCountryNameByCode(country);
-                if (countryValidado == string.Empty)
+                var countryName = GetCountryNameByCode(countryCode);
+                if (countryName == string.Empty)
                 {
-                    xmlOutput = "<Text>Invalid Country</Text>";
+                    xmlOutput = "<Text>No Match: '" + countryCode + "' is not a valid contry code</Text>";
                 }
                 else
                 {
-                    var StringDirectory = GetStringDirectory(first, last, number, country, start);
-                    StringDirectory = StringDirectory.Replace("<Name>", "<Name>" + country.ToUpper())
-                                                     .Replace("<Prompt>Records", "<Prompt>Contactos")
-                                                     .Replace(" to ", " a ")
-                                                     .Replace(" of ", " de ");
+                    var stringDirectory = GetStringDirectory(first, last, number, countryName, start);
+                    xmlOutput = FixFormatForSingleCountry(stringDirectory, countryCode, countryName, first, last, number, start);
                 }
             }
             else
             {
-                directories = GetDirectories(first, last, number, countryValidado, start);
-                var directoryListOrdered = new List<IPPhoneDirectoryEntry>();
-                foreach (var dir in directories)
-                {
-                    var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
-                    directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
-                }
+                //directories = GetDirectories(first, last, number, countryValidado, start);
+                //var directoryListOrdered = new List<IPPhoneDirectoryEntry>();
+                //foreach (var dir in directories)
+                //{
+                //    var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
+                //    directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
+                //}
 
 
-                int intPage = Int32.Parse(page);
-                if (intPage >= 1 && ((intPage - 1) * 31 + 31) >= directoryListOrdered.Count)
-                {
-                    //obtener mas registros
-                    directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
-                    foreach (var dir in directories)
-                    {
-                        var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
-                        directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
-                    }
-                }
+                //int intPage = Int32.Parse(page);
+                //if (intPage >= 1 && ((intPage - 1) * 31 + 31) >= directoryListOrdered.Count)
+                //{
+                //    //obtener mas registros
+                //    directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
+                //    foreach (var dir in directories)
+                //    {
+                //        var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
+                //        directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
+                //    }
+                //}
 
-                var selection = GetEntriesByPage(directoryListOrdered, intPage);
+                //var selection = GetEntriesByPage(directoryListOrdered, intPage);
 
 
 
-                var stringXMLOrderedEntries = CovertEntriesToString(selection);
+                //var stringXMLOrderedEntries = CovertEntriesToString(selection);
 
-                xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
-                            "<CiscoIPPhoneDirectory>" + Environment.NewLine +
-                            stringXMLOrderedEntries + Environment.NewLine +
-                            "</CiscoIPPhoneDirectory>";
+                //xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
+                //            "<CiscoIPPhoneDirectory>" + Environment.NewLine +
+                //            stringXMLOrderedEntries + Environment.NewLine +
+                //            "</CiscoIPPhoneDirectory>";
             }
 
                         
@@ -151,7 +147,7 @@ namespace CustomDirectory.v2
         }
         private string GetDirectoryUrlByCountry(string country)
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("DirectoryUrl_" + country);
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + country);
         }
         private string GetPrefixByCountry(string country)
         {
@@ -377,6 +373,28 @@ namespace CustomDirectory.v2
                     return countryItem.Key;
             }
             return string.Empty;
+        }
+        private string BuildQueryStringSearch(string first, string last, string number, string start)
+        {
+            return "?l=" + last + "&f=" + first +  "&n=" + number + "&start=" + start;
+        }
+        private string FixFormatForSingleCountry(string stringDirectory, string countryCode, string countryName, string first, string last, string number, string start)
+        {
+            return stringDirectory.Replace("<Name>", "<Name>[" + countryCode.ToUpper() + "] ")
+                                  .Replace("<Prompt>Records", "<Prompt>Contactos")
+                                  .Replace(" to ", " a ")
+                                  .Replace(" of ", " de ")
+                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Dial", "<Name>Dial")
+                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Search", "<Name>Search")
+                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Exit", "<Name>Exit")
+                                  .Replace("<Name>[" + countryCode.ToUpper() + "] EditDial", "<Name>EditDial")
+                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Next", "<Name>Next")
+                                  .Replace("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
+                                           "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory") + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
+                                  .Replace(("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName) + "</URL>").Replace("&", "&amp;"),
+                                            "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing") + "</URL>")
+                                  .Replace("&amp;", "&")
+                                  .Replace("<?xml version=\"1.0\"?>","");
         }
     }
 }

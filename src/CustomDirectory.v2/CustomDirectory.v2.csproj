@@ -64,6 +64,7 @@
     <Compile Include="CustomDirectory.aspx.designer.cs">
       <DependentUpon>CustomDirectory.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Model\Country.cs" />
     <Compile Include="Model\Directory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
