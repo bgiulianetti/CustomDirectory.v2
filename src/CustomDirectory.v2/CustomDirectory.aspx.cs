@@ -152,13 +152,6 @@ namespace CustomDirectory.v2
             }
             return response.Content.ReadAsStringAsync().Result;
 
-            
-            //var request = (HttpWebRequest)WebRequest.Create(url);
-            //var response = (HttpWebResponse)request.GetResponse();
-            //var sr = new StreamReader(response.GetResponseStream());
-            //var stringDirectory = sr.ReadToEnd();
-            //sr.Close();
-
             //stringDirectory = FixFormatDirectoryString(stringDirectory, country);
             //stringDirectory = DeleteBottomMenu(stringDirectory);
 
@@ -440,11 +433,6 @@ namespace CustomDirectory.v2
                                   .Replace("Fari�a", "Fariña")
                                   .Replace("Malarg�e", "Malargüe")
                                   .Replace("Mar�a", "María");
-        }
-
-        private HttpWebRequest InitializeWebRequest()
-        {
-            return null;
         }
     }
 }
