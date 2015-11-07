@@ -391,9 +391,8 @@ namespace CustomDirectory.v2
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Next", "<Name>Next")
                                   .Replace("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
                                            "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory") + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
-                                  .Replace(("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName) + "</URL>").Replace("&", "&amp;"),
+                                  .Replace(("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
                                             "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing") + "</URL>")
-                                  .Replace("&amp;", "&")
                                   .Replace("<?xml version=\"1.0\"?>", "");
         }
     }
