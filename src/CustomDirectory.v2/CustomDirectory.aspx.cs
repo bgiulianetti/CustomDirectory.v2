@@ -10,6 +10,8 @@ using System.Xml;
 using System.Net;
 using System.IO;
 using CustomDirectory.v2.Model;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace CustomDirectory.v2
 {
@@ -44,8 +46,15 @@ namespace CustomDirectory.v2
                 }
                 else
                 {
-                    var stringDirectory = GetStringDirectory(first, last, number, countryName, start);
-                    xmlOutput = FixFormatForSingleCountry(stringDirectory, countryCode, countryName, first, last, number, start);
+                    var stringDirectory = GetStringDirectory(new HttpClient(), first, last, number, countryName, start);
+                    if (stringDirectory == null)
+                    {
+                        xmlOutput = "<Text>Internal Server Error</Text>";
+                    }
+                    else
+                    {
+                        xmlOutput = FixFormatForSingleCountry(stringDirectory, countryCode, countryName, first, last, number, start);
+                    }
                 }
             }
             else
@@ -128,14 +137,27 @@ namespace CustomDirectory.v2
             }
             return xmlDirectories;
         }        
-        private string GetStringDirectory(string first, string last, string number, string country, string start)
+        private string GetStringDirectory(HttpClient client, string first, string last, string number, string country, string start)
         {
-            var url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            var response = (HttpWebResponse)request.GetResponse();
-            var sr = new StreamReader(response.GetResponseStream());
-            var stringDirectory = sr.ReadToEnd();
-            sr.Close();
+            client.BaseAddress = new Uri(GetDirectoryUrlByCountry(country));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            HttpResponseMessage response = null;
+            var intStart = Int32.Parse(start);
+            for (int i = 1; i <= intStart; i += 31)
+            {
+                var request = "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + i.ToString();
+                response = client.GetAsync(request).Result;
+                if (!response.IsSuccessStatusCode)
+                    return null;
+            }
+            return response.Content.ReadAsStringAsync().Result;
+
+            
+            //var request = (HttpWebRequest)WebRequest.Create(url);
+            //var response = (HttpWebResponse)request.GetResponse();
+            //var sr = new StreamReader(response.GetResponseStream());
+            //var stringDirectory = sr.ReadToEnd();
+            //sr.Close();
 
             //stringDirectory = FixFormatDirectoryString(stringDirectory, country);
             //stringDirectory = DeleteBottomMenu(stringDirectory);
@@ -143,7 +165,7 @@ namespace CustomDirectory.v2
             //stringDirectory = stringDirectory.Replace("<DirectoryEntry>", "#");
             //stringDirectory = stringDirectory.Replace("</DirectoryEntry>", "");
 
-            return stringDirectory;
+            
         }
         private string GetDirectoryUrlByCountry(string country)
         {
@@ -317,28 +339,30 @@ namespace CustomDirectory.v2
         }
         private List<IPPhoneDirectoryEntry> GetDirectoryEntriesList(string first, string last, string number, string country, string start)
         {
-            var list = new List<IPPhoneDirectoryEntry>();
-            var stringEntries = GetStringDirectory(first, last, number, country, start);
-            var arrayEntries = stringEntries.Split('#');
-            foreach (var entry in arrayEntries)
-            {
-                if (entry.Contains("<Name>"))
-                {
-                    var entryFixed = entry.Replace("<Name>", string.Empty)
-                                          .Replace("</Name>", "#")
-                                          .Replace("</Telephone>", string.Empty)
-                                          .Replace("<Telephone>", string.Empty);
+            //var list = new List<IPPhoneDirectoryEntry>();
+            //var stringEntries = GetStringDirectory(first, last, number, country, start);
+            //var arrayEntries = stringEntries.Split('#');
+            //foreach (var entry in arrayEntries)
+            //{
+            //    if (entry.Contains("<Name>"))
+            //    {
+            //        var entryFixed = entry.Replace("<Name>", string.Empty)
+            //                              .Replace("</Name>", "#")
+            //                              .Replace("</Telephone>", string.Empty)
+            //                              .Replace("<Telephone>", string.Empty);
 
-                    var arrayEntry = entryFixed.Split('#');
+            //        var arrayEntry = entryFixed.Split('#');
 
-                    var IPEntry = new IPPhoneDirectoryEntry();
+            //        var IPEntry = new IPPhoneDirectoryEntry();
 
-                    IPEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
-                    IPEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
-                    list.Add(IPEntry);
-                }
-            }
-            return list;
+            //        IPEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+            //        IPEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+            //        list.Add(IPEntry);
+            //    }
+            //}
+            //return list;
+
+            return null;
         }
         private IPPhoneDirectory GetSingleDirectory(string first, string last, string number, string country, string start)
         {
@@ -398,7 +422,7 @@ namespace CustomDirectory.v2
 
         private HttpWebRequest InitializeWebRequest()
         {
-
+            return null;
         }
     }
 }
