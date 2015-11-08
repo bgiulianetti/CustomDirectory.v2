@@ -416,6 +416,11 @@ namespace CustomDirectory.v2
             var isEmpty = false;
             while (!isEmpty)
             {
+                if(start != "1")
+                {
+                    var intStart = Int32.Parse(start) + 31;
+                    start = intStart.ToString();
+                }
                 var directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
                 if (!directoryPage.Contains("<Name>Next</Name>"))
                     isEmpty = true;
@@ -438,6 +443,7 @@ namespace CustomDirectory.v2
                         list.Add(IpEntry);
                     }
                 }
+
             }
             return list;
         }
@@ -452,6 +458,18 @@ namespace CustomDirectory.v2
         /// <returns>List<IPPhoneDirectory></returns>
         private List<IPPhoneDirectory> GetAllDirectories(string first, string last, string number, string start)
         {
+            var list = new List<IPPhoneDirectory>();
+            var countries = GetAvailableCountries();
+            foreach (var itemCountry in countries)
+            {
+                var IpPhoneDirectory = new IPPhoneDirectory();
+                IpPhoneDirectory.Country = itemCountry;
+                var listEntries = GetDirectoryEntriesList(first, last, number, itemCountry.Name, start);
+                IpPhoneDirectory.DirectoryEntries = listEntries;
+                IpPhoneDirectory.EntriesCount = listEntries.Count;
+                list.Add(IpPhoneDirectory);
+            }
+            return list;
             //var IPPhoneDirectories = new List<IPPhoneDirectory>();
             //var countries = GetAvailableCountries();
             //foreach (var countryItem in countries)
@@ -461,8 +479,6 @@ namespace CustomDirectory.v2
             //}
 
             //return IPPhoneDirectories;
-            return null;
-
 
 
 
