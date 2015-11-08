@@ -414,12 +414,17 @@ namespace CustomDirectory.v2
             var list = new List<IPPhoneDirectoryEntry>();
 
             var isEmpty = false;
+            var isFirstTime = true;
             while (!isEmpty)
             {
-                if(start != "1")
+                if(!isFirstTime)
                 {
                     var intStart = Int32.Parse(start) + 31;
                     start = intStart.ToString();
+                }
+                else
+                {
+                    isFirstTime = false;
                 }
                 var directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
                 if (!directoryPage.Contains("<Name>Next</Name>"))
@@ -443,7 +448,6 @@ namespace CustomDirectory.v2
                         list.Add(IpEntry);
                     }
                 }
-
             }
             return list;
         }
