@@ -45,14 +45,14 @@ namespace CustomDirectory.v2
                 }
                 else
                 {
-                    var stringDirectory = GetStringDirectory(new HttpClient(), first, last, number, countryName, start);
-                    if (stringDirectory == null)
+                    var stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, countryName, start);
+                    if (stringSinglePageDirectory == null)
                     {
                         xmlOutput = "<Text>Internal Server Error</Text>";
                     }
                     else
                     {
-                        xmlOutput = FixFormatForSingleCountry(stringDirectory, countryCode, countryName, first, last, number, start);
+                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, countryCode, countryName, first, last, number, start);
                     }
                 }
             }
@@ -110,9 +110,8 @@ namespace CustomDirectory.v2
             var dirWithCountryCode = new IPPhoneDirectory();
             dirWithCountryCode.Country = dir.Country;
             dirWithCountryCode.EntriesCount = dir.EntriesCount;
-            dirWithCountryCode.Prefix = dir.Prefix;
             dirWithCountryCode.DirectoryEntries = new List<IPPhoneDirectoryEntry>();
-            var countryCode = "[" + GetCountryCodeByName(dir.Country).ToUpper() + "] ";
+            var countryCode = "[" + GetCountryCodeByName(dir.Country.Name).ToUpper() + "] ";
 
             foreach (var item in dir.DirectoryEntries)
             {
@@ -135,11 +134,6 @@ namespace CustomDirectory.v2
                                   "</DirectoryEntry>" + Environment.NewLine;
             }
             return xmlDirectories;
-        }
-        
-        private string GetDirectoryUrlByCountry(string country)
-        {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + country);
         }
         private string GetPrefixByCountry(string country)
         {
@@ -179,13 +173,6 @@ namespace CustomDirectory.v2
                 "</SoftKeyItem>" + Environment.NewLine +
                 "</CiscoIPPhoneDirectory>";
         }
-        private string DeleteBottomMenu(string stringDirectory)
-        {
-            for (int i = 0; i < stringDirectory.Length; i++)
-                if (stringDirectory[i].ToString() == "<" && stringDirectory[i + 1].ToString() == "P")
-                    stringDirectory = stringDirectory.Substring(0, i);
-            return stringDirectory;
-        }
         private string SelectFirstNRecords(string cadena, int recordsCount)
         {
             int cant = 0;
@@ -198,14 +185,6 @@ namespace CustomDirectory.v2
             }
             return cadena;
         }
-        private string FixFormatDirectoryString(string stringDirectory, string country)
-        {
-            stringDirectory = stringDirectory.Replace("<?xml version=\"1.0\"?>", "").
-                              Replace("<CiscoIPPhoneDirectory>", "").
-                              Replace("Garc�a", "Garcia");
-
-            return stringDirectory;
-        }
         private string ConcatDirectories(List<string> directories)
         {
             var directoryFull = string.Empty;
@@ -215,128 +194,6 @@ namespace CustomDirectory.v2
             }
             return directoryFull;
         }
-        private List<IPPhoneDirectory> GetAllDirectories(string first, string last, string number, string start)
-        {
-            var IPPhoneDirectories = new List<IPPhoneDirectory>();
-            var countries = GetAvailableCountries();
-            foreach (var countryItem in countries)
-            {
-                
-                IPPhoneDirectories.Add(GetSingleDirectory(first, last, number, countryItem.Value, start));
-            }
-            
-            return IPPhoneDirectories;
-            
-            //if(country == "")
-
-            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-
-            //    var directories = new List<string>();
-            //    directories.Add(ClDirectory);
-            //    directories.Add(ArgDirectory);
-
-            //    FullDirectory = ConcatDirectories(directories);
-            //    countryMessage = "Records from all countries";
-            //}
-            //else if (string.Equals(country, "cl", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-            //    countryMessage = "Records from Chile";
-            //}
-            //else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-            //    countryMessage = "Records from Argentina";
-            //}
-            //else
-            //{
-            //    notRecordsFound = true;
-            //}
-
-            //if (!notRecordsFound)
-            //{
-            //    finalXML = BuildFinalXML(FullDirectory, countryMessage);
-            //}
-            //else
-            //{
-            //    finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
-            //}
-        }
-        
-        private int GetDirectoryEntriesCount(string first, string last, string number, string country, string start)
-        {
-            var url = GetDirectoryUrlByCountry(country) + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            var response = (HttpWebResponse)request.GetResponse();
-            var sr = new StreamReader(response.GetResponseStream());
-            var stringDirectory = sr.ReadToEnd();
-            sr.Close();
-
-            var index = stringDirectory.IndexOf("</Prompt>");
-            while (stringDirectory[index] != ' ')
-                index--;
-
-            var recordsCount = string.Empty;
-            while (stringDirectory[index] != '<')
-            {
-                recordsCount += stringDirectory[index];
-                index++;
-            }
-
-            //index = stringDirectory.IndexOf(";start=");
-            //var startParameter = string.Empty;
-            //while (stringDirectory[index] != '<')
-            //{
-            //    startParameter += stringDirectory[index];
-            //    index++;
-            //}
-            int aux = 0;
-            int.TryParse(recordsCount, out aux);
-            return aux;
-        }
-        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesList(string first, string last, string number, string country, string start)
-        {
-            //var list = new List<IPPhoneDirectoryEntry>();
-            //var stringEntries = GetStringDirectory(first, last, number, country, start);
-            //var arrayEntries = stringEntries.Split('#');
-            //foreach (var entry in arrayEntries)
-            //{
-            //    if (entry.Contains("<Name>"))
-            //    {
-            //        var entryFixed = entry.Replace("<Name>", string.Empty)
-            //                              .Replace("</Name>", "#")
-            //                              .Replace("</Telephone>", string.Empty)
-            //                              .Replace("<Telephone>", string.Empty);
-
-            //        var arrayEntry = entryFixed.Split('#');
-
-            //        var IPEntry = new IPPhoneDirectoryEntry();
-
-            //        IPEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
-            //        IPEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
-            //        list.Add(IPEntry);
-            //    }
-            //}
-            //return list;
-
-            return null;
-        }
-        private IPPhoneDirectory GetSingleDirectory(string first, string last, string number, string country, string start)
-        {
-            var Directory = new IPPhoneDirectory();
-            var entriesList = new List<IPPhoneDirectoryEntry>();
-
-            Directory.Country = country;
-            Directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, Directory.Country, start);
-            Directory.Prefix = GetPrefixByCountry(Directory.Country);
-
-            entriesList.AddRange(GetDirectoryEntriesList(first, last, number, Directory.Country, start));
-            Directory.DirectoryEntries = entriesList;
-
-            return Directory;
-        }
-
         private string GetCountryCodeByName(string countryName)
         {
             var countries = GetAvailableCountries();
@@ -363,7 +220,7 @@ namespace CustomDirectory.v2
         /// <param name="country"></param>
         /// <param name="start"></param>
         /// <returns></returns>
-        private string GetStringDirectory(HttpClient client, string first, string last, string number, string country, string start)
+        private string GetStringSinglePageDirectory(HttpClient client, string first, string last, string number, string country, string start)
         {
             client.BaseAddress = new Uri(GetDirectoryUrlByCountry(country));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -384,12 +241,6 @@ namespace CustomDirectory.v2
                     return null;
             }
             return response.Content.ReadAsStringAsync().Result;
-
-            //stringDirectory = FixFormatDirectoryString(stringDirectory, country);
-            //stringDirectory = DeleteBottomMenu(stringDirectory);
-
-            //stringDirectory = stringDirectory.Replace("<DirectoryEntry>", "#");
-            //stringDirectory = stringDirectory.Replace("</DirectoryEntry>", "");
         }
         
         /// <summary>
@@ -420,8 +271,8 @@ namespace CustomDirectory.v2
             var countries = GetAvailableCountries();
             foreach (var countryItem in countries)
             {
-                if (countryCode == countryItem.Key)
-                    return countryItem.Value; ;
+                if (countryCode == countryItem.Code)
+                    return countryItem.Name; ;
             }
             return string.Empty;
         }
@@ -439,6 +290,17 @@ namespace CustomDirectory.v2
             return "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
         }
 
+        /// <summary>
+        /// Fixes the string format, wrong accentuation, adds country code to each record.
+        /// </summary>
+        /// <param name="stringDirectory"></param>
+        /// <param name="countryCode"></param>
+        /// <param name="countryName"></param>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
         private string FixFormatForSingleCountry(string stringDirectory, string countryCode, string countryName, string first, string last, string number, string start)
         {
             return stringDirectory.Replace("<Name>", "<Name>[" + countryCode.ToUpper() + "] ")
@@ -477,6 +339,178 @@ namespace CustomDirectory.v2
                                   .Replace("Fari�a", "Fariña")
                                   .Replace("Malarg�e", "Malargüe")
                                   .Replace("Mar�a", "María");
+        }
+
+        /// <summary>
+        /// Gets a complete IPPhone directory
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="country"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
+        private IPPhoneDirectory GetIPPhoneDirectory(string first, string last, string number, Country country, string start)
+        {
+            var directory = new IPPhoneDirectory();
+            directory.Country = country;
+            directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, country.Name, start);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the directory entries count
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="country"></param>
+        /// <param name="start"></param>
+        /// <returns>int</returns>
+        private int GetDirectoryEntriesCount(string first, string last, string number, string country, string start)
+        {
+            var stringDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
+
+            var index = stringDirectory.IndexOf("</Prompt>");
+            while (stringDirectory[index] != ' ')
+                index--;
+
+            var recordsCount = string.Empty;
+            while (stringDirectory[index] != '<')
+            {
+                recordsCount += stringDirectory[index];
+                index++;
+            }
+            int aux = 0;
+            int.TryParse(recordsCount, out aux);
+            return aux;
+        }
+
+        /// <summary>
+        /// Deletes all buttons to be printed on screen
+        /// </summary>
+        /// <param name="stringDirectory"></param>
+        /// <returns>string</returns>
+        private string DeleteBottomMenu(string stringDirectory)
+        {
+            for (int i = 0; i < stringDirectory.Length; i++)
+                if (stringDirectory[i].ToString() == "<" && stringDirectory[i + 1].ToString() == "P")
+                    stringDirectory = stringDirectory.Substring(0, i);
+            return stringDirectory;
+        }
+
+        /// <summary>
+        /// Gets all the entries of a Directory with a specific search criteria
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="country"></param>
+        /// <param name="start"></param>
+        /// <returns>List<IPPhoneDirectoryEntry></returns>
+        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesList(string first, string last, string number, string country, string start)
+        {
+            var list = new List<IPPhoneDirectoryEntry>();
+
+            var isEmpty = false;
+            while (!isEmpty)
+            {
+                var directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
+                if (!directoryPage.Contains("<Name>Next</Name>"))
+                    isEmpty = true;
+
+                directoryPage = DeleteBottomMenu(directoryPage).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+                var arrayEntries = directoryPage.Split('#');
+                foreach (var entry in arrayEntries)
+                {
+                    if (entry.Contains("<Name>"))
+                    {
+                        var entryFixed = entry.Replace("<Name>", string.Empty)
+                                              .Replace("</Name>", "#")
+                                              .Replace("</Telephone>", string.Empty)
+                                              .Replace("<Telephone>", string.Empty);
+
+                        var arrayEntry = entryFixed.Split('#');
+                        var IpEntry = new IPPhoneDirectoryEntry();
+                        IpEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                        IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+                        list.Add(IpEntry);
+                    }
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Gets All entries of each directory available with a specific search criteria
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="start"></param>
+        /// <returns>List<IPPhoneDirectory></returns>
+        private List<IPPhoneDirectory> GetAllDirectories(string first, string last, string number, string start)
+        {
+            //var IPPhoneDirectories = new List<IPPhoneDirectory>();
+            //var countries = GetAvailableCountries();
+            //foreach (var countryItem in countries)
+            //{
+            //    var directory = GetIPPhoneDirectory(first, last, number, countryItem, start);
+            //    IPPhoneDirectories.Add(GetSingleDirectory(first, last, number, countryItem.Value, start));
+            //}
+
+            //return IPPhoneDirectories;
+            return null;
+
+
+
+
+            //if(country == "")
+
+            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+
+            //    var directories = new List<string>();
+            //    directories.Add(ClDirectory);
+            //    directories.Add(ArgDirectory);
+
+            //    FullDirectory = ConcatDirectories(directories);
+            //    countryMessage = "Records from all countries";
+            //}
+            //else if (string.Equals(country, "cl", StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
+            //    countryMessage = "Records from Chile";
+            //}
+            //else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
+            //    countryMessage = "Records from Argentina";
+            //}
+            //else
+            //{
+            //    notRecordsFound = true;
+            //}
+
+            //if (!notRecordsFound)
+            //{
+            //    finalXML = BuildFinalXML(FullDirectory, countryMessage);
+            //}
+            //else
+            //{
+            //    finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
+            //}
+        }
+
+        /// <summary>
+        /// Gets the directory URL by the country name
+        /// </summary>
+        /// <param name="country"></param>
+        /// <returns>string</returns>
+        private string GetDirectoryUrlByCountry(string country)
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + country);
         }
     }
 }
