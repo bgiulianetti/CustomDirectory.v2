@@ -33,7 +33,7 @@ namespace CustomDirectory.v2
             if (countryCode == null) countryCode = string.Empty;
             if (number == null) number = string.Empty;
             if (start == null) start = "1";
-            if (page == null) page = "0";
+            if (page == null) page = "1";
             #endregion
 
             if (countryCode != string.Empty)
@@ -53,176 +53,39 @@ namespace CustomDirectory.v2
                     else
                     {
                         xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, countryCode, countryName, first, last, number, start);
+                        xmlOutput = FixAccentuation(xmlOutput);
                     }
                 }
             }
             else
             {
                 var directories = GetAllDirectories(first, last, number, start);
-                //var directoryListOrdered = new List<IPPhoneDirectoryEntry>();
-                //foreach (var dir in directories)
-                //{
-                //    var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
-                //    directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
-                //}
-
-
-                //int intPage = Int32.Parse(page);
-                //if (intPage >= 1 && ((intPage - 1) * 31 + 31) >= directoryListOrdered.Count)
-                //{
-                //    //obtener mas registros
-                //    directories = GetDirectories(first, last, number, countryValidado, (Int32.Parse(start) + 31).ToString());
-                //    foreach (var dir in directories)
-                //    {
-                //        var entriesWithCountryCode = AddCountryCodeToDirectoryEntries(dir);
-                //        directoryListOrdered.AddRange(entriesWithCountryCode.DirectoryEntries);
-                //    }
-                //}
-
-                //var selection = GetEntriesByPage(directoryListOrdered, intPage);
-
-
-
-                //var stringXMLOrderedEntries = CovertEntriesToString(selection);
-
-                //xmlOutput = "<?xml version=\"1.0\"?>" + Environment.NewLine +
-                //            "<CiscoIPPhoneDirectory>" + Environment.NewLine +
-                //            stringXMLOrderedEntries + Environment.NewLine +
-                //            "</CiscoIPPhoneDirectory>";
+                var allEntries = GetEntriesOrderedAndWithPrefix(directories);
+                var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
+                xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
+                xmlOutput = FixAccentuation(xmlOutput);
             }
-
-
-
             Response.ContentType = "text/xml";
             Response.Write(xmlOutput);
         }
-
-        private List<IPPhoneDirectoryEntry> GetEntriesByPage(List<IPPhoneDirectoryEntry> listEntries, int page)
-        {
-            var list = new List<IPPhoneDirectoryEntry>();
-            for (int i = page * 31; i < (page * 31) + 31; i++)
-                list.Add(listEntries[i]);
-
-            return list;
-        }
-        private IPPhoneDirectory AddCountryCodeToDirectoryEntries(IPPhoneDirectory dir)
-        {
-            var dirWithCountryCode = new IPPhoneDirectory();
-            dirWithCountryCode.Country = dir.Country;
-            dirWithCountryCode.EntriesCount = dir.EntriesCount;
-            dirWithCountryCode.DirectoryEntries = new List<IPPhoneDirectoryEntry>();
-            var countryCode = "[" + GetCountryCodeByName(dir.Country.Name).ToUpper() + "] ";
-
-            foreach (var item in dir.DirectoryEntries)
-            {
-                var entry = new IPPhoneDirectoryEntry();
-                entry.Name = countryCode + item.Name;
-                entry.Telephone = item.Telephone;
-                dirWithCountryCode.DirectoryEntries.Add(entry);
-            }
-            return dirWithCountryCode;
-        }
-        private string CovertEntriesToString(List<IPPhoneDirectoryEntry> list)
-        {
-            string xmlDirectories = string.Empty;
-
-            foreach (var item in list)
-            {
-                xmlDirectories += "<DirectoryEntry>" + Environment.NewLine +
-                                  "<Name>" + item.Name + "</Name>" + Environment.NewLine +
-                                  "<Telephone>" + item.Telephone + "</Telephone>" + Environment.NewLine +
-                                  "</DirectoryEntry>" + Environment.NewLine;
-            }
-            return xmlDirectories;
-        }
-        private string GetPrefixByCountry(string country)
-        {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("Prefix_" + country);
-        }
-        private string BuildFinalXML(string FullDirectory, string countryMessage)
-        {
-            return "<CiscoIPPhoneDirectory>" + Environment.NewLine + FullDirectory +
-                    "<Prompt>" + countryMessage + "</Prompt>" + Environment.NewLine +
-                    "<SoftKeyItem>" + Environment.NewLine +
-                        "<Name>Llamar</Name>" + Environment.NewLine +
-                        "<URL>SoftKey:Dial</URL>" + Environment.NewLine +
-                        "<Position>1</Position>" + Environment.NewLine +
-                    "</SoftKeyItem>" + Environment.NewLine +
-                    "<SoftKeyItem>" + Environment.NewLine +
-                        "<Name>Editar</Name>" + Environment.NewLine +
-                        "<URL>SoftKey:EditDial</URL>" + Environment.NewLine +
-                        "<Position>2</Position>" + Environment.NewLine +
-                    "</SoftKeyItem>" + Environment.NewLine +
-                    "<SoftKeyItem>" + Environment.NewLine +
-                        "<Name>Salir</Name>" + Environment.NewLine +
-                        "<URL>SoftKey:Exit</URL>" +
-                        "<Position>3</Position>" + Environment.NewLine +
-                    "</SoftKeyItem>" + Environment.NewLine +
-
-
-                "<SoftKeyItem>" + Environment.NewLine +
-                "<Name>Next</Name>" + Environment.NewLine +
-                "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlAspx") + "?start=32</URL>" + Environment.NewLine +
-                "<Position>4</Position>" + Environment.NewLine +
-                "</SoftKeyItem>" + Environment.NewLine +
-
-                "<SoftKeyItem>" + Environment.NewLine +
-                "<Name>Search</Name>" + Environment.NewLine +
-                "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlAspx") + "</URL>" + Environment.NewLine +
-                "<Position>5</Position>" + Environment.NewLine +
-                "</SoftKeyItem>" + Environment.NewLine +
-                "</CiscoIPPhoneDirectory>";
-        }
-        private string SelectFirstNRecords(string cadena, int recordsCount)
-        {
-            int cant = 0;
-            for (int i = 0; i < cadena.Length; i++)
-            {
-                if (cadena[i].ToString() == "<" && cadena[i + 1].ToString() == "D")
-                    cant++;
-                if (cant == recordsCount)
-                    cadena = cadena.Substring(0, i);
-            }
-            return cadena;
-        }
-        private string ConcatDirectories(List<string> directories)
-        {
-            var directoryFull = string.Empty;
-            foreach (var item in directories)
-            {
-                directoryFull += Environment.NewLine + item;
-            }
-            return directoryFull;
-        }
-        private string GetCountryCodeByName(string countryName)
-        {
-            var countries = GetAvailableCountries();
-            foreach (var countryItem in countries)
-            {
-                if (countryName == countryItem.Name)
-                    return countryItem.Code;
-            }
-            return string.Empty;
-        }
-
-
-
-        /////////////////////////////////////////////////////////////////////////////////////
 
 
         /// <summary>
         /// Gets 31 entries form a directory, counting from the 'start' parameter.
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="first"></param>
-        /// <param name="last"></param>
-        /// <param name="number"></param>
-        /// <param name="country"></param>
-        /// <param name="start"></param>
+        /// <param name="client">Http Client instance (You cannot get the second page without requesting the first one)</param>
+        /// <param name="first">First name</param>
+        /// <param name="last">Last name</param>
+        /// <param name="number">Phone number</param>
+        /// <param name="country">Country name</param>
+        /// <param name="start">The number of records to skip</param>
         /// <returns></returns>
-        private string GetStringSinglePageDirectory(HttpClient client, string first, string last, string number, string country, string start)
+        private string GetStringSinglePageDirectory(HttpClient client, string first, string last, string number, string countryName, string start)
         {
-            client.BaseAddress = new Uri(GetDirectoryUrlByCountry(country));
+            var directoryUrl = GetDirectoryUrlByCountry(countryName);
+            if (directoryUrl == null)
+                return null;
+            client.BaseAddress = new Uri(directoryUrl);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             HttpResponseMessage response = null;
             var intStart = Int32.Parse(start);
@@ -262,7 +125,7 @@ namespace CustomDirectory.v2
         }
 
         /// <summary>
-        /// Retrieve the name of a country from it´s code
+        /// Gets the name of a country by it´s code
         /// </summary>
         /// <param name="countryCode"></param>
         /// <returns></returns>
@@ -278,16 +141,19 @@ namespace CustomDirectory.v2
         }
                
         /// <summary>
-        /// Builds a string format to add a Directory URL search
+        /// Builds a string format to add a Directory URL as a QueryString to perform a search
         /// </summary>
         /// <param name="first">Name of a contact</param>
         /// <param name="last">Last name of a contact</param>
         /// <param name="number">Phone number of a contact</param>
         /// <param name="start">Number of entries to skip</param>
         /// <returns>Query String search</returns>
-        private string BuildQueryStringSearch(string first, string last, string number, string start)
+        private string BuildQueryStringSearch(string first, string last, string number, string start, string page = null)
         {
-            return "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            if (page == null)
+                return "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + start;
+            else
+                return "?l=" + last + "&f=" + first + "&n=" + number + "&page=" + page;
         }
 
         /// <summary>
@@ -304,41 +170,19 @@ namespace CustomDirectory.v2
         private string FixFormatForSingleCountry(string stringDirectory, string countryCode, string countryName, string first, string last, string number, string start)
         {
             return stringDirectory.Replace("<Name>", "<Name>[" + countryCode.ToUpper() + "] ")
-                //.Replace("<Prompt>Records", "<Prompt>Contactos")
-                //.Replace(" to ", " a ")
-                //.Replace(" of ", " de ")
+                                  //.Replace("<Prompt>Records", "<Prompt>Contactos")
+                                  //.Replace(" to ", " a ")
+                                  //.Replace(" of ", " de ")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Dial", "<Name>Dial")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Search", "<Name>Search")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Exit", "<Name>Exit")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] EditDial", "<Name>EditDial")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Next", "<Name>Next")
-                                  .Replace("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
-                                           "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory") + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
-                                  .Replace(("<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
-                                            "<URL>" + System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing") + "</URL>")
-                                  .Replace("<?xml version=\"1.0\"?>", "")
-                                  .Replace("Garc�a", "García")
-                                  .Replace("A�on", "Añon")
-                                  .Replace("R�o", "Río")
-                                  .Replace("Reuni�n", "Reunión")
-                                  .Replace("Fandi�o", "Fandiño")
-                                  .Replace("Hern�n", "Hernán")
-                                  .Replace("Larra�aga", "Larrañaga")
-                                  .Replace("Franc�s", "Francés")
-                                  .Replace("Mej�a", "Mejía")
-                                  .Replace("M�ximo", "Máximo")
-                                  .Replace("Espi�o", "Espiño")
-                                  .Replace("Nu�ez", "Nuñez")
-                                  .Replace("Iguaz�", "Iguazú")
-                                  .Replace("Tr�fico", "Tráfico")
-                                  .Replace("Tucum�n", "Tucumán")
-                                  .Replace("Jass�n", "Jassén")
-                                  .Replace("Cama�o", "Camaño")
-                                  .Replace("Mart�n", "Martín")
-                                  .Replace("Emisi�n", "Emisión")
-                                  .Replace("Fari�a", "Fariña")
-                                  .Replace("Malarg�e", "Malargüe")
-                                  .Replace("Mar�a", "María");
+                                  .Replace("<URL>" + GetUrlDirectoryByName(countryName) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
+                                           "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
+                                  .Replace(("<URL>" + GetUrlDirectoryLandingByName(countryName) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
+                                            "<URL>" + GetUrlDirectoryLandingByName(countryName) + "</URL>")
+                                  .Replace("<?xml version=\"1.0\"?>", "");
         }
 
         /// <summary>
@@ -474,63 +318,185 @@ namespace CustomDirectory.v2
                 list.Add(IpPhoneDirectory);
             }
             return list;
-            //var IPPhoneDirectories = new List<IPPhoneDirectory>();
-            //var countries = GetAvailableCountries();
-            //foreach (var countryItem in countries)
-            //{
-            //    var directory = GetIPPhoneDirectory(first, last, number, countryItem, start);
-            //    IPPhoneDirectories.Add(GetSingleDirectory(first, last, number, countryItem.Value, start));
-            //}
-
-            //return IPPhoneDirectories;
-
-
-
-            //if(country == "")
-
-            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-
-            //    var directories = new List<string>();
-            //    directories.Add(ClDirectory);
-            //    directories.Add(ArgDirectory);
-
-            //    FullDirectory = ConcatDirectories(directories);
-            //    countryMessage = "Records from all countries";
-            //}
-            //else if (string.Equals(country, "cl", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    ClDirectory = GetDirectory("chile", last, first, number, start.ToString());
-            //    countryMessage = "Records from Chile";
-            //}
-            //else if (string.Equals(country, "arg", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    ArgDirectory = GetDirectory("argentina", last, first, number, start.ToString());
-            //    countryMessage = "Records from Argentina";
-            //}
-            //else
-            //{
-            //    notRecordsFound = true;
-            //}
-
-            //if (!notRecordsFound)
-            //{
-            //    finalXML = BuildFinalXML(FullDirectory, countryMessage);
-            //}
-            //else
-            //{
-            //    finalXML = "<CiscoIPPhoneDirectory><Prompt>Busqueda sin coincidencias</Prompt></CiscoIPPhoneDirectory>";
-            //}
         }
 
         /// <summary>
         /// Gets the directory URL by the country name
         /// </summary>
-        /// <param name="country"></param>
+        /// <param name="country">Name of the country</param>
         /// <returns>string</returns>
-        private string GetDirectoryUrlByCountry(string country)
+        private string GetDirectoryUrlByCountry(string countryName)
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + country);
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName);
+        }
+
+        /// <summary>
+        /// Gets a List of entries ordered alphabetically and with cpuntry prefix country added from a list of directories
+        /// </summary>
+        /// <param name="directories">List<IPPhoneDirectory></param>
+        /// <returns>List<IPPhoneDirectoryEntry></returns>
+        private List<IPPhoneDirectoryEntry> GetEntriesOrderedAndWithPrefix(List<IPPhoneDirectory> directories)
+        {
+            var listOrderedWithPrefixes = new List<IPPhoneDirectoryEntry>();
+            foreach (var dir in directories)
+            {
+                foreach (var entryItem in dir.DirectoryEntries)
+                {
+                    var entry = new IPPhoneDirectoryEntry();
+                    entry.Name = "[" + dir.Country.Code.ToUpper() + "] " + entryItem.Name;
+                    entry.Telephone = dir.Country.Prefix + entryItem.Telephone;
+                    listOrderedWithPrefixes.Add(entry);
+                }
+            }
+            //ordernar lista
+            return listOrderedWithPrefixes;
+        }
+
+        /// <summary>
+        /// Returns an XML of a softkey to be printed on screen
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="action"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        private string BuildSoftKey(string name, string action, int position)
+        {
+            return "<SoftKeyItem>" + Environment.NewLine +
+                   "<Name>" + name + "</Name>" + Environment.NewLine +
+                   "<URL>" + action + "</URL>" + Environment.NewLine +
+                   "<Position>" + position.ToString() + "</Position>" + Environment.NewLine +
+                   "</SoftKeyItem>" + Environment.NewLine;
+        }
+
+        /// <summary>
+        /// Gets 31 entries from a entries list start from the parameter page
+        /// </summary>
+        /// <param name="allEntries"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        private List<IPPhoneDirectoryEntry> SelectEntriesByPage(List<IPPhoneDirectoryEntry> allEntries, int page)
+        {
+            var selectedEntries = new List<IPPhoneDirectoryEntry>();
+            int start = ((page - 1) * 31);
+            for (int i = start; i < start + 31; i++)
+            {
+                selectedEntries.Add(allEntries[i]);
+            }
+            return selectedEntries;
+        }
+
+        /// <summary>
+        /// Builds a string XML formated to be preinted on screen as a final search
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="page"></param>
+        /// <param name="totalEntries"></param>
+        /// <returns></returns>
+        private string BuildXML(List<IPPhoneDirectoryEntry> entries, string first, string last, string number, string page, int totalEntries)
+        {
+            var xmlOutput = "<CiscoIPPhoneDirectory>" + Environment.NewLine;
+            foreach (var item in entries)
+            {
+                xmlOutput += ConvertEntryToString(item);
+            }
+
+            var intPage = Int32.Parse(page);
+            int start = ((intPage - 1) * 31) + 1;
+            xmlOutput += "<Prompt>Records " + start.ToString() + " to " + (start + 31).ToString() + " of " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
+            xmlOutput += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
+            xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
+            xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
+            xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), GetUrlCustomDirectory() + BuildQueryStringSearch(first, last, number, "",  (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page="), 4);
+            xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlDirectoryLanding(), 5);
+            xmlOutput += "</CiscoIPPhoneDirectory>";
+
+            return xmlOutput;        
+        }
+
+        /// <summary>
+        /// Returns an string XML formated entry
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        private string ConvertEntryToString(IPPhoneDirectoryEntry entry)
+        {
+            return "<DirectoryEntry>" + Environment.NewLine +
+                   "<Name>" + entry.Name + "</Name>" + Environment.NewLine +
+                   "<Telephone>" + entry.Telephone + "</Telephone>" + Environment.NewLine + 
+                   "</DirectoryEntry>" + Environment.NewLine;
+        }
+
+        /// <summary>
+        /// Gets the Url Custom directory from the WebConfig
+        /// </summary>
+        /// <returns></returns>
+        private string GetUrlCustomDirectory()
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
+        }
+
+        /// <summary>
+        /// Gets the Url directory from the WebConfig by the country name
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <returns></returns>
+        private string GetUrlDirectoryByName(string countryName)
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName);
+        }
+
+        /// <summary>
+        /// Gets the Url directory landing from the WebConfig by the country name
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <returns></returns>
+        private string GetUrlDirectoryLandingByName(string countryName)
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName);
+        }
+
+        /// <summary>
+        /// Gets the Url directory landing from the WebConfig
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <returns></returns>
+        private string GetUrlDirectoryLanding()
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing");
+        }
+
+        /// <summary>
+        /// Fixes accentuation and letter 'ñ' on names
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private string FixAccentuation(string text)
+        {
+            return text.Replace("Garc�a", "García")
+                                  .Replace("A�on", "Añon")
+                                  .Replace("R�o", "Río")
+                                  .Replace("Reuni�n", "Reunión")
+                                  .Replace("Fandi�o", "Fandiño")
+                                  .Replace("Hern�n", "Hernán")
+                                  .Replace("Larra�aga", "Larrañaga")
+                                  .Replace("Franc�s", "Francés")
+                                  .Replace("Mej�a", "Mejía")
+                                  .Replace("M�ximo", "Máximo")
+                                  .Replace("Espi�o", "Espiño")
+                                  .Replace("Nu�ez", "Nuñez")
+                                  .Replace("Iguaz�", "Iguazú")
+                                  .Replace("Tr�fico", "Tráfico")
+                                  .Replace("Tucum�n", "Tucumán")
+                                  .Replace("Jass�n", "Jassén")
+                                  .Replace("Cama�o", "Camaño")
+                                  .Replace("Mart�n", "Martín")
+                                  .Replace("Emisi�n", "Emisión")
+                                  .Replace("Fari�a", "Fariña")
+                                  .Replace("Malarg�e", "Malargüe")
+                                  .Replace("Mar�a", "María");
         }
     }
 }

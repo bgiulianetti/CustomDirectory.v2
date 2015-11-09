@@ -17,4 +17,13 @@ namespace CustomDirectory.v2.Model
         public string Name { get; set; }
         public string Telephone { get; set; }
     }
+
+    public enum SoftKey
+    {
+        Dial,
+        EditDial,
+        Exit,
+        Next,
+        Search
+    }
 }
