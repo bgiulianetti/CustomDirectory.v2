@@ -21,7 +21,7 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
-            var first = Request.QueryString["f"];
+            var first = "alexis";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -380,6 +380,8 @@ namespace CustomDirectory.v2
             int start = ((page - 1) * 31);
             for (int i = start; i < start + 31; i++)
             {
+                if (i == allEntries.Count)
+                    break;
                 selectedEntries.Add(allEntries[i]);
             }
             return selectedEntries;
