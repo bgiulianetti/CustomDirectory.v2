@@ -21,7 +21,7 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
-            var first = "alexis";// Request.QueryString["f"];
+            var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -186,24 +186,6 @@ namespace CustomDirectory.v2
         }
 
         /// <summary>
-        /// Gets a complete IPPhone directory
-        /// </summary>
-        /// <param name="first"></param>
-        /// <param name="last"></param>
-        /// <param name="number"></param>
-        /// <param name="country"></param>
-        /// <param name="start"></param>
-        /// <returns></returns>
-        private IPPhoneDirectory GetIPPhoneDirectory(string first, string last, string number, Country country, string start)
-        {
-            var directory = new IPPhoneDirectory();
-            directory.Country = country;
-            directory.EntriesCount = GetDirectoryEntriesCount(first, last, number, country.Name, start);
-
-            return null;
-        }
-
-        /// <summary>
         /// Gets the directory entries count
         /// </summary>
         /// <param name="first"></param>
@@ -259,8 +241,12 @@ namespace CustomDirectory.v2
 
             var isEmpty = false;
             var isFirstTime = true;
+            int interruptionLoopTooLong = 0;
+            int topEntriesSearch = GetTopEntriesSearch();
             while (!isEmpty)
             {
+                if (interruptionLoopTooLong == topEntriesSearch)
+                    break;
                 if(!isFirstTime)
                 {
                     var intStart = Int32.Parse(start) + 31;
@@ -292,6 +278,7 @@ namespace CustomDirectory.v2
                         list.Add(IpEntry);
                     }
                 }
+                interruptionLoopTooLong++;
             }
             return list;
         }
@@ -407,7 +394,17 @@ namespace CustomDirectory.v2
 
             var intPage = Int32.Parse(page);
             int start = ((intPage - 1) * 31) + 1;
-            xmlOutput += "<Prompt>Records " + start.ToString() + " to " + (start + 31).ToString() + " of " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
+
+            int entriesPerPage = 0;
+            if (totalEntries < 31)
+            {
+                entriesPerPage = totalEntries;
+            }
+            else
+            {
+                entriesPerPage = start + 31;
+            }
+            xmlOutput += "<Prompt>Records " + start.ToString() + " to " + (entriesPerPage).ToString() + " of " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
             xmlOutput += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
             xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
             xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
@@ -499,6 +496,15 @@ namespace CustomDirectory.v2
                                   .Replace("Fari�a", "Fariña")
                                   .Replace("Malarg�e", "Malargüe")
                                   .Replace("Mar�a", "María");
+        }
+
+        /// <summary>
+        /// Gets the maximun entries that a search could return when the filter does not specify a country
+        /// </summary>
+        /// <returns></returns>
+        private int GetTopEntriesSearch()
+        {
+            return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings.Get("TopEntriesSearch"));
         }
     }
 }
