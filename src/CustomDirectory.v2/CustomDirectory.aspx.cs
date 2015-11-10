@@ -23,7 +23,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "arg";// Request.QueryString["p"];
+            var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
