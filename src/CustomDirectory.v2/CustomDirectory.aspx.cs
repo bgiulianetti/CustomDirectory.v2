@@ -52,7 +52,7 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, countryCode, country, first, last, number, start);
+                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country.Code, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
                 }
