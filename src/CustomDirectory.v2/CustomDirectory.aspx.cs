@@ -38,21 +38,21 @@ namespace CustomDirectory.v2
 
             if (countryCode != string.Empty)
             {
-                var countryName = GetCountryNameByCode(countryCode);
-                if (countryName == string.Empty)
+                var country = GetCountryByCode(countryCode);
+                if (country == null)
                 {
-                    xmlOutput = "<Text>No Match: '" + countryCode + "' is not a valid contry code</Text>";
+                    xmlOutput = "<Text>No Match: '" + country.Code + "' is not a valid contry code</Text>";
                 }
                 else
                 {
-                    var stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, countryName, start);
+                    var stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country.Name, start);
                     if (stringSinglePageDirectory == null)
                     {
                         xmlOutput = "<Text>Internal Server Error</Text>";
                     }
                     else
                     {
-                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, countryCode, countryName, first, last, number, start);
+                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, countryCode, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
                 }
@@ -129,15 +129,15 @@ namespace CustomDirectory.v2
         /// </summary>
         /// <param name="countryCode"></param>
         /// <returns></returns>
-        private string GetCountryNameByCode(string countryCode)
+        private Country GetCountryByCode(string countryCode)
         {
             var countries = GetAvailableCountries();
             foreach (var countryItem in countries)
             {
                 if (countryCode == countryItem.Code)
-                    return countryItem.Name; ;
+                    return countryItem;
             }
-            return string.Empty;
+            return null;
         }
                
         /// <summary>
@@ -167,7 +167,7 @@ namespace CustomDirectory.v2
         /// <param name="number"></param>
         /// <param name="start"></param>
         /// <returns></returns>
-        private string FixFormatForSingleCountry(string stringDirectory, string countryCode, string countryName, string first, string last, string number, string start)
+        private string FixFormatForSingleCountry(string stringDirectory, string countryCode, Country country, string first, string last, string number, string start)
         {
             return stringDirectory.Replace("<Name>", "<Name>[" + countryCode.ToUpper() + "] ")
                                   .Replace("<Prompt>Records", "<Prompt>Contactos")
@@ -178,39 +178,12 @@ namespace CustomDirectory.v2
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Exit", "<Name>Exit")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] EditDial", "<Name>EditDial")
                                   .Replace("<Name>[" + countryCode.ToUpper() + "] Next", "<Name>Next")
-                                  .Replace("<URL>" + GetUrlDirectoryByName(countryName) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
+                                  .Replace("<Telephone>", "<Telephone>" + country.Prefix)
+                                  .Replace("<URL>" + GetUrlDirectoryByName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
                                            "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
-                                  .Replace(("<URL>" + GetUrlDirectoryLandingByName(countryName) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
-                                            "<URL>" + GetUrlDirectoryLandingByName(countryName) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start")
+                                  .Replace(("<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
+                                            "<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start")
                                   .Replace("<?xml version=\"1.0\"?>", "");
-        }
-
-        /// <summary>
-        /// Gets the directory entries count
-        /// </summary>
-        /// <param name="first"></param>
-        /// <param name="last"></param>
-        /// <param name="number"></param>
-        /// <param name="country"></param>
-        /// <param name="start"></param>
-        /// <returns>int</returns>
-        private int GetDirectoryEntriesCount(string first, string last, string number, string country, string start)
-        {
-            var stringDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
-
-            var index = stringDirectory.IndexOf("</Prompt>");
-            while (stringDirectory[index] != ' ')
-                index--;
-
-            var recordsCount = string.Empty;
-            while (stringDirectory[index] != '<')
-            {
-                recordsCount += stringDirectory[index];
-                index++;
-            }
-            int aux = 0;
-            int.TryParse(recordsCount, out aux);
-            return aux;
         }
 
         /// <summary>
