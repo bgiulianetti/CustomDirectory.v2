@@ -396,7 +396,7 @@ namespace CustomDirectory.v2
             int start = ((intPage - 1) * 31) + 1;
 
             int entriesPerPage = 0;
-            if (totalEntries < 31)
+            if (totalEntries <= 31)
             {
                 //Pagina de una busqueda con menos de 31 entradas
                 entriesPerPage = totalEntries;
@@ -406,7 +406,7 @@ namespace CustomDirectory.v2
                 if (totalEntries - start > 31)
                 {   
                     //Pagina de una busqueda de mas de 31 entradas
-                    entriesPerPage = start + 31;
+                    entriesPerPage = start + 30;
                 }
                 else
                 {
