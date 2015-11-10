@@ -21,7 +21,7 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
-            var first = Request.QueryString["f"];
+            var first = "ale";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -398,11 +398,21 @@ namespace CustomDirectory.v2
             int entriesPerPage = 0;
             if (totalEntries < 31)
             {
+                //Pagina de una busqueda con menos de 31 entradas
                 entriesPerPage = totalEntries;
             }
             else
             {
-                entriesPerPage = start + 31;
+                if (totalEntries - start > 31)
+                {   
+                    //Pagina de una busqueda de mas de 31 entradas
+                    entriesPerPage = start + 31;
+                }
+                else
+                {
+                    //Ultima pagina de una busqueda de mas de 31 entradas
+                    entriesPerPage = totalEntries;
+                }
             }
             xmlOutput += "<Prompt>Registros " + start.ToString() + " a " + (entriesPerPage).ToString() + " de " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
             xmlOutput += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
