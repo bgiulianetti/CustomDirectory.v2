@@ -52,7 +52,7 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country.Code, country, first, last, number, start);
+                        xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
                 }
@@ -156,6 +156,14 @@ namespace CustomDirectory.v2
                 return "?l=" + last + "&f=" + first + "&n=" + number + "&page=" + page;
         }
 
+        private string BuildQueryStringSearchWithCountryParameter(string first, string last, string number, string start, string country, string page = null)
+        {
+            if (page == null)
+                return "?l=" + last + "&f=" + first + "&n=" + number + "&p=" + country + "&start=" + start;
+            else
+                return "?l=" + last + "&f=" + first + "&n=" + number + "&p=" + country + "&page=" + page;
+        }
+
         /// <summary>
         /// Fixes the string format, wrong accentuation, adds country code to each record.
         /// </summary>
@@ -167,20 +175,20 @@ namespace CustomDirectory.v2
         /// <param name="number"></param>
         /// <param name="start"></param>
         /// <returns></returns>
-        private string FixFormatForSingleCountry(string stringDirectory, string countryCode, Country country, string first, string last, string number, string start)
+        private string FixFormatForSingleCountry(string stringDirectory, Country country, string first, string last, string number, string start)
         {
-            return stringDirectory.Replace("<Name>", "<Name>[" + countryCode.ToUpper() + "] ")
+            return stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ")
                                   .Replace("<Prompt>Records", "<Prompt>Contactos")
                                   .Replace(" to ", " a ")
                                   .Replace(" of ", " de ")
-                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Dial", "<Name>Dial")
-                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Search", "<Name>Search")
-                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Exit", "<Name>Exit")
-                                  .Replace("<Name>[" + countryCode.ToUpper() + "] EditDial", "<Name>EditDial")
-                                  .Replace("<Name>[" + countryCode.ToUpper() + "] Next", "<Name>Next")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next")
                                   .Replace("<Telephone>", "<Telephone>" + country.Prefix)
                                   .Replace("<URL>" + GetUrlDirectoryByName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
-                                           "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>")
+                                           "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>")
                                   .Replace(("<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
                                             "<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start")
                                   .Replace("<?xml version=\"1.0\"?>", "");

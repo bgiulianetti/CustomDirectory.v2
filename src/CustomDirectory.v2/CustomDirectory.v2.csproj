@@ -85,7 +85,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomDirectory.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomDirectory.aspx.cs">
@@ -99,11 +101,10 @@
     <Compile Include="Model\Directory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\PublishProfiles\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\pub.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
