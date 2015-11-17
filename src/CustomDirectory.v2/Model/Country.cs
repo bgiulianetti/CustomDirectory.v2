@@ -19,7 +19,7 @@ namespace CustomDirectory.v2.Model
             if (string.IsNullOrEmpty(code))
                 throw new Exception(INVALID_CODE);
 
-            if (string.IsNullOrEmpty(prefix))
+            if (prefix == null)
                 throw new Exception(INVALID_PREFIX);
 
             Name = name;
