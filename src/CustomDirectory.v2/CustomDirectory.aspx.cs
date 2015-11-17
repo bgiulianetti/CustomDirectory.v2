@@ -156,6 +156,16 @@ namespace CustomDirectory.v2
                 return "?l=" + last + "&f=" + first + "&n=" + number + "&page=" + page;
         }
 
+        /// <summary>
+        /// Builds a string format to add a Directory URL as a QueryString to perform a search including de parameter country [p]
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="start"></param>
+        /// <param name="country"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         private string BuildQueryStringSearchWithCountryParameter(string first, string last, string number, string start, string country, string page = null)
         {
             if (page == null)
