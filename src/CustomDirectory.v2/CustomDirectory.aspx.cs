@@ -392,6 +392,7 @@ namespace CustomDirectory.v2
             {
                 //Pagina de una busqueda con menos de 31 entradas
                 entriesPerPage = totalEntries;
+                showNext = false;
             }
             else
             {
