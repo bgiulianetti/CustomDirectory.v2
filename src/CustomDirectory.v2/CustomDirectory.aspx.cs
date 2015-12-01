@@ -23,7 +23,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var first = "ale";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "eeuu";// Request.QueryString["p"];
+            var countryCode = "br";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -96,7 +96,7 @@ namespace CustomDirectory.v2
                 return null;
             HttpClient client2 = new HttpClient();
             client2.BaseAddress = new Uri(directoryUrl);
-            client2.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            client2.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = null;
             var intStart = Int32.Parse(start);
             for (int i = 1; i <= intStart; i += 31)
