@@ -96,15 +96,27 @@ namespace CustomDirectory.v2
                 return null;
             HttpClient client2 = new HttpClient();
             client2.BaseAddress = new Uri(directoryUrl);
-            client2.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
+            
             HttpResponseMessage response = null;
             var intStart = Int32.Parse(start);
+
+            var request = new HttpRequestMessage();
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
+            request.RequestUri = new Uri(directoryUrl + "?l=" + last + "&f=" + first + "&n=" + number);
+
+
+            request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch");
+            request.Headers.Add("Accept-Language", "es,en;q=0.8,en-US;q=0.6,pt-BR;q=0.4,pt;q=0.2,es-419;q=0.2,de;q=0.2");
+            request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36");
+
+            
             for (int i = 1; i <= intStart; i += 31)
             {
-                var request = "?l=" + last + "&f=" + first + "&n=" + number;// +"&start=" + i.ToString();
+                //var request = "?l=" + last + "&f=" + first + "&n=" + number;// +"&start=" + i.ToString();
                 try
                 {
-                    response = client2.GetAsync(request).Result;
+
+                    response = client2.SendAsync(request).Result;
                 }
                 catch (Exception ex)
                 {
