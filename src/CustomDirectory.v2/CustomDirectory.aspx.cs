@@ -22,8 +22,8 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var first = "ale";// Request.QueryString["f"];
-            var last = Request.QueryString["l"];
-            var countryCode = "br";// Request.QueryString["p"];
+            var last = "castiglio";// Request.QueryString["l"];
+            var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -471,6 +471,7 @@ namespace CustomDirectory.v2
             return "<DirectoryEntry>" + Environment.NewLine +
                    "<Name>" + entry.Name + "</Name>" + Environment.NewLine +
                    "<Telephone>" + entry.Telephone + "</Telephone>" + Environment.NewLine +
+                   "<E-mail>e-mail</E-mail>" + Environment.NewLine +
                    "</DirectoryEntry>" + Environment.NewLine;
         }
 
