@@ -21,8 +21,8 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
-            var first = "ale";// Request.QueryString["f"];
-            var last = "castiglio";// Request.QueryString["l"];
+            var first = "alexis";// Request.QueryString["f"];
+            var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
@@ -41,7 +41,9 @@ namespace CustomDirectory.v2
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
                 {
-                    xmlOutput = "<Text>No Match: '" + country.Code + "' is not a valid contry code</Text>";
+                    xmlOutput = "<Title>No Match</Title>" + Environment.NewLine +
+                    "<Prompt/>" + Environment.NewLine +
+                    "<Text>'" + country.Code + "' is not a valid contry code</Text>";
                 }
                 else
                 {
@@ -54,7 +56,9 @@ namespace CustomDirectory.v2
                     }
                     catch (Exception ex)
                     {
-                        xmlOutput = "<Text>Error: " + ex.Message + "</Text>";
+                        xmlOutput = "<Title>Error</Title>" + Environment.NewLine +
+                        "<Prompt/>" + Environment.NewLine +
+                        "<Text>" + ex.Message + "</Text>";
                     }
                 }
             }
@@ -71,7 +75,9 @@ namespace CustomDirectory.v2
                 }
                 catch (Exception ex)
                 {
-                    xmlOutput = "<Text>Error: " + ex.Message + "</Text>";
+                    xmlOutput = "<Title>Error</Title>" + Environment.NewLine +
+                    "<Prompt/>" + Environment.NewLine +
+                    "<Text>" + ex.Message + "</Text>";
                 }
             }
             Response.ContentType = "text/xml";
@@ -96,7 +102,7 @@ namespace CustomDirectory.v2
                 return null;
             HttpClient client2 = new HttpClient();
             client2.BaseAddress = new Uri(directoryUrl);
-            
+
             HttpResponseMessage response = null;
             var intStart = Int32.Parse(start);
 
@@ -109,7 +115,7 @@ namespace CustomDirectory.v2
             request.Headers.Add("Accept-Language", "es,en;q=0.8,en-US;q=0.6,pt-BR;q=0.4,pt;q=0.2,es-419;q=0.2,de;q=0.2");
             request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36");
 
-            
+
             for (int i = 1; i <= intStart; i += 31)
             {
                 //var request = "?l=" + last + "&f=" + first + "&n=" + number;// +"&start=" + i.ToString();
