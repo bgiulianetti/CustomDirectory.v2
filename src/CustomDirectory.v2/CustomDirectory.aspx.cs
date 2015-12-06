@@ -596,7 +596,6 @@ namespace CustomDirectory.v2
                     "<Text>" + message + "</Text>";
         }
 
-
         /// <summary>
         /// Gets All entries of Peru, Uruguay or Colombia directories with a specific search criteria
         /// </summary>
