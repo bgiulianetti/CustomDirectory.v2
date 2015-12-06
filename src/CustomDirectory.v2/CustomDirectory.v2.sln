@@ -7,14 +7,32 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDirectory.v2", "Custo
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AR|Any CPU = AR|Any CPU
+		BR|Any CPU = BR|Any CPU
+		CN|Any CPU = CN|Any CPU
+		CS|Any CPU = CS|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		PY|Any CPU = PY|Any CPU
 		Release|Any CPU = Release|Any CPU
+		US|Any CPU = US|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.AR|Any CPU.ActiveCfg = AR|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.AR|Any CPU.Build.0 = AR|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.BR|Any CPU.ActiveCfg = BR|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.BR|Any CPU.Build.0 = BR|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.CN|Any CPU.ActiveCfg = CN|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.CN|Any CPU.Build.0 = CN|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.CS|Any CPU.ActiveCfg = CS|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.CS|Any CPU.Build.0 = CS|Any CPU
 		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.PY|Any CPU.ActiveCfg = PY|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.PY|Any CPU.Build.0 = PY|Any CPU
 		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.US|Any CPU.ActiveCfg = US|Any CPU
+		{5A6AB8D1-B166-441B-A2F4-8CE4D6C2E179}.US|Any CPU.Build.0 = US|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
