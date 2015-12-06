@@ -21,7 +21,7 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
-            var first = "al";// Request.QueryString["f"];
+            var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -549,6 +549,11 @@ namespace CustomDirectory.v2
             return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings.Get("TopEntriesSearch"));
         }
 
+        /// <summary>
+        /// Generates a request adding user agent, accept encoding, and accept language
+        /// </summary>
+        /// <param name="directoryUrl"></param>
+        /// <returns></returns>
         private HttpRequestMessage GenerateHttpRequestMassage(string directoryUrl)
         {
             var request = new HttpRequestMessage();
