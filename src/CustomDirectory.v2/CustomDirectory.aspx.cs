@@ -12,6 +12,7 @@ using System.IO;
 using CustomDirectory.v2.Model;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Configuration;
 
 namespace CustomDirectory.v2
 {
@@ -21,6 +22,7 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
+            var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
@@ -41,9 +43,8 @@ namespace CustomDirectory.v2
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
                 {
-                    xmlOutput = "<Title>No Match</Title>" + Environment.NewLine +
-                    "<Prompt/>" + Environment.NewLine +
-                    "<Text>'" + country.Code + "' is not a valid contry code</Text>";
+                    xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + "_ErrorNoMartches"), 
+                                                   ConfigurationManager.AppSettings.Get(language + "_InvalidCountryCode"));
                 }
                 else
                 {
@@ -56,9 +57,7 @@ namespace CustomDirectory.v2
                     }
                     catch (Exception ex)
                     {
-                        xmlOutput = "<Title>Error</Title>" + Environment.NewLine +
-                        "<Prompt/>" + Environment.NewLine +
-                        "<Text>" + ex.Message + "</Text>";
+                        xmlOutput = FormatErrorMessage("Error", ex.Message);
                     }
                 }
             }
@@ -75,9 +74,7 @@ namespace CustomDirectory.v2
                 }
                 catch (Exception ex)
                 {
-                    xmlOutput = "<Title>Error</Title>" + Environment.NewLine +
-                    "<Prompt/>" + Environment.NewLine +
-                    "<Text>" + ex.Message + "</Text>";
+                    xmlOutput = FormatErrorMessage("Error", ex.Message);
                 }
             }
             Response.ContentType = "text/xml";
@@ -119,7 +116,7 @@ namespace CustomDirectory.v2
                     throw new Exception(ex.Message);
                 }
                 if (!response.IsSuccessStatusCode)
-                    throw new Exception(response.ReasonPhrase + ", Getting country " + countryName);
+                    throw new Exception(response.ReasonPhrase + " " + ConfigurationManager.AppSettings.Get(GetLanguageApplication() + "_GettingCountry") + ": " + countryName);
             }
             return response.Content.ReadAsStringAsync().Result;
         }
@@ -131,7 +128,7 @@ namespace CustomDirectory.v2
         private List<Country> GetAvailableCountries()
         {
             List<Country> countryList = new List<Country>();
-            var arrCountries = System.Configuration.ConfigurationManager.AppSettings.Get("Countries").Split('|');
+            var arrCountries = ConfigurationManager.AppSettings.Get("Countries").Split('|');
             for (int i = 0; i < arrCountries.Count(); i++)
             {
                 var country = new Country(name: arrCountries[i].Split(':')[0],
@@ -205,10 +202,11 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string FixFormatForSingleCountry(string stringDirectory, Country country, string first, string last, string number, string start)
         {
+            var language = GetLanguageApplication();
             return stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ")
-                                  .Replace("<Prompt>Records", "<Prompt>Contactos")
-                                  .Replace(" to ", " a ")
-                                  .Replace(" of ", " de ")
+                                  .Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + "_Records"))
+                                  .Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + "_To") + " ")
+                                  .Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + "_Of") + " ")
                                   .Replace("<Name>[" + country.Code + "] Dial", "<Name>Dial")
                                   .Replace("<Name>[" + country.Code + "] Search", "<Name>Search")
                                   .Replace("<Name>[" + country.Code + "] Exit", "<Name>Exit")
@@ -342,7 +340,7 @@ namespace CustomDirectory.v2
         /// <returns>string</returns>
         private string GetDirectoryUrlByCountry(string countryName)
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName);
+            return ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName);
         }
 
         /// <summary>
@@ -414,10 +412,11 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string BuildXML(List<IPPhoneDirectoryEntry> entries, string first, string last, string number, string page, int totalEntries)
         {
+            var language = GetLanguageApplication();
             var xmlOutput = "<CiscoIPPhoneDirectory>" + Environment.NewLine;
             foreach (var item in entries)
             {
-                xmlOutput += ConvertEntryToString(item);
+                xmlOutput += item.ToString();
             }
 
             var intPage = Int32.Parse(page);
@@ -445,7 +444,7 @@ namespace CustomDirectory.v2
                     showNext = false;
                 }
             }
-            xmlOutput += "<Prompt>Registros " + start.ToString() + " a " + (entriesPerPage).ToString() + " de " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
+            xmlOutput += "<Prompt>" + ConfigurationManager.AppSettings.Get(language + "_Records") + " " + start.ToString() + " a " + (entriesPerPage).ToString() + " de " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
             xmlOutput += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
             xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
             xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
@@ -457,18 +456,18 @@ namespace CustomDirectory.v2
             return xmlOutput;
         }
 
-        /// <summary>
-        /// Returns an string XML formated entry
-        /// </summary>
-        /// <param name="entry"></param>
-        /// <returns></returns>
-        private string ConvertEntryToString(IPPhoneDirectoryEntry entry)
-        {
-            return "<DirectoryEntry>" + Environment.NewLine +
-                   "<Name>" + entry.Name + "</Name>" + Environment.NewLine +
-                   "<Telephone>" + entry.Telephone + "</Telephone>" + Environment.NewLine +
-                   "</DirectoryEntry>" + Environment.NewLine;
-        }
+        ///// <summary>
+        ///// Returns an string XML formated entry
+        ///// </summary>
+        ///// <param name="entry"></param>
+        ///// <returns></returns>
+        //private string ConvertEntryToString(IPPhoneDirectoryEntry entry)
+        //{
+        //    return "<DirectoryEntry>" + Environment.NewLine +
+        //           "<Name>" + entry.Name + "</Name>" + Environment.NewLine +
+        //           "<Telephone>" + entry.Telephone + "</Telephone>" + Environment.NewLine +
+        //           "</DirectoryEntry>" + Environment.NewLine;
+        //}
 
         /// <summary>
         /// Gets the Url Custom directory from the WebConfig
@@ -476,7 +475,7 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string GetUrlCustomDirectory()
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
+            return ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
         }
 
         /// <summary>
@@ -563,6 +562,28 @@ namespace CustomDirectory.v2
             request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36");
 
             return request;
+        }
+
+        /// <summary>
+        /// Gets the language of the aplication. English[EN] or Spanish[ES]
+        /// </summary>
+        /// <returns></returns>
+        private string GetLanguageApplication()
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("Language");
+        }
+
+        /// <summary>
+        /// Formatex and xml of an error with its title and message
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private string FormatErrorMessage(string title, string message)
+        {
+            return "<Title>" + title + "</Title>" + Environment.NewLine +
+                    "<Prompt/>" + Environment.NewLine +
+                    "<Text>" + message + "</Text>";
         }
     }
 }
