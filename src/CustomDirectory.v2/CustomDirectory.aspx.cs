@@ -21,7 +21,7 @@ namespace CustomDirectory.v2
         {
             #region QueryStrings
             var xmlOutput = string.Empty;
-            var first = "alexis";// Request.QueryString["f"];
+            var first = "al";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -100,29 +100,19 @@ namespace CustomDirectory.v2
             var directoryUrl = GetDirectoryUrlByCountry(countryName.Replace(" ", "_"));
             if (directoryUrl == null)
                 return null;
-            HttpClient client2 = new HttpClient();
-            client2.BaseAddress = new Uri(directoryUrl);
 
+            client.BaseAddress = new Uri(directoryUrl);
             HttpResponseMessage response = null;
             var intStart = Int32.Parse(start);
-
-            var request = new HttpRequestMessage();
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
-            request.RequestUri = new Uri(directoryUrl + "?l=" + last + "&f=" + first + "&n=" + number);
-
-
-            request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch");
-            request.Headers.Add("Accept-Language", "es,en;q=0.8,en-US;q=0.6,pt-BR;q=0.4,pt;q=0.2,es-419;q=0.2,de;q=0.2");
-            request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36");
 
 
             for (int i = 1; i <= intStart; i += 31)
             {
-                //var request = "?l=" + last + "&f=" + first + "&n=" + number;// +"&start=" + i.ToString();
+                var request = GenerateHttpRequestMassage(directoryUrl);
+                request.RequestUri = new Uri(directoryUrl + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + i.ToString());
                 try
                 {
-
-                    response = client2.SendAsync(request).Result;
+                    response = client.SendAsync(request).Result;
                 }
                 catch (Exception ex)
                 {
@@ -477,7 +467,6 @@ namespace CustomDirectory.v2
             return "<DirectoryEntry>" + Environment.NewLine +
                    "<Name>" + entry.Name + "</Name>" + Environment.NewLine +
                    "<Telephone>" + entry.Telephone + "</Telephone>" + Environment.NewLine +
-                   "<E-mail>e-mail</E-mail>" + Environment.NewLine +
                    "</DirectoryEntry>" + Environment.NewLine;
         }
 
@@ -558,6 +547,17 @@ namespace CustomDirectory.v2
         private int GetTopEntriesSearch()
         {
             return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings.Get("TopEntriesSearch"));
+        }
+
+        private HttpRequestMessage GenerateHttpRequestMassage(string directoryUrl)
+        {
+            var request = new HttpRequestMessage();
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
+            request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch");
+            request.Headers.Add("Accept-Language", "es,en;q=0.8,en-US;q=0.6,pt-BR;q=0.4,pt;q=0.2,es-419;q=0.2,de;q=0.2");
+            request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36");
+
+            return request;
         }
     }
 }
