@@ -24,7 +24,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = "cas";// Request.QueryString["l"];
+            var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
@@ -38,12 +38,13 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
-            if (countryCode != string.Empty)
+            //Pais especifico
+            if (countryCode != string.Empty && countryCode != "co" && countryCode != "uy" && countryCode != "pe")
             {
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
                 {
-                    xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + "_ErrorNoMartches"), 
+                    xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + "_ErrorNoMartches"),
                                                    ConfigurationManager.AppSettings.Get(language + "_InvalidCountryCode"));
                 }
                 else
@@ -61,7 +62,29 @@ namespace CustomDirectory.v2
                     }
                 }
             }
-            else
+            // colombia peru o uruguay
+            else if (countryCode != string.Empty && countryCode == "co" || countryCode == "uy" || countryCode == "pe")
+            {
+                ///////////////////
+                var directories = new List<IPPhoneDirectory>();
+                try
+                {
+                    var country = GetCountryByCode(countryCode);
+                    var ArrNumber = ConfigurationManager.AppSettings.Get(country.Name + "_Prefix").Split('-');
+                    foreach (var itemNumber in ArrNumber)
+                    {
+                        directories.AddRange(GetAllDirectories_CO_PE_UY(first, last, itemNumber, start, country));
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                ///////////////////
+            }
+            //Todos los paises
+            else if (countryCode == string.Empty)
             {
                 List<IPPhoneDirectory> directories = null;
                 try
@@ -456,19 +479,6 @@ namespace CustomDirectory.v2
             return xmlOutput;
         }
 
-        ///// <summary>
-        ///// Returns an string XML formated entry
-        ///// </summary>
-        ///// <param name="entry"></param>
-        ///// <returns></returns>
-        //private string ConvertEntryToString(IPPhoneDirectoryEntry entry)
-        //{
-        //    return "<DirectoryEntry>" + Environment.NewLine +
-        //           "<Name>" + entry.Name + "</Name>" + Environment.NewLine +
-        //           "<Telephone>" + entry.Telephone + "</Telephone>" + Environment.NewLine +
-        //           "</DirectoryEntry>" + Environment.NewLine;
-        //}
-
         /// <summary>
         /// Gets the Url Custom directory from the WebConfig
         /// </summary>
@@ -584,6 +594,104 @@ namespace CustomDirectory.v2
             return "<Title>" + title + "</Title>" + Environment.NewLine +
                     "<Prompt/>" + Environment.NewLine +
                     "<Text>" + message + "</Text>";
+        }
+
+
+        /// <summary>
+        /// Gets All entries of Peru, Uruguay or Colombia directories with a specific search criteria
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="start"></param>
+        /// <returns>List<IPPhoneDirectory></returns>
+        private List<IPPhoneDirectory> GetAllDirectories_CO_PE_UY(string first, string last, string number, string start, Country country)
+        {
+            var list = new List<IPPhoneDirectory>();
+            var IpPhoneDirectory = new IPPhoneDirectory();
+            IpPhoneDirectory.Country = country;
+            List<IPPhoneDirectoryEntry> listEntries = null;
+            try
+            {
+                listEntries = GetDirectoryEntriesList_CO_PE_UY(first, last, number, country.Name, start);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            IpPhoneDirectory.DirectoryEntries = listEntries;
+            IpPhoneDirectory.EntriesCount = listEntries.Count;
+            list.Add(IpPhoneDirectory);
+
+            return list;
+        }
+
+        /// <summary>
+        /// Gets all the entries of a Directories from Colombia, Peru and Uruguay with a specific search criteria
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="number"></param>
+        /// <param name="country"></param>
+        /// <param name="start"></param>
+        /// <returns>List<IPPhoneDirectoryEntry></returns>
+        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesList_CO_PE_UY(string first, string last, string number, string country, string start)
+        {
+            var list = new List<IPPhoneDirectoryEntry>();
+
+            var isEmpty = false;
+            var isFirstTime = true;
+            int interruptionLoopTooLong = 0;
+            int topEntriesSearch = GetTopEntriesSearch();
+            while (!isEmpty)
+            {
+                if (interruptionLoopTooLong == topEntriesSearch)
+                    break;
+                if (!isFirstTime)
+                {
+                    var intStart = Int32.Parse(start) + 31;
+                    start = intStart.ToString();
+                }
+                else
+                {
+                    isFirstTime = false;
+                }
+
+                var directoryPage = string.Empty;
+                try
+                {
+                    directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+
+                if (!directoryPage.Contains("<Name>Next</Name>"))
+                    isEmpty = true;
+
+                directoryPage = DeleteBottomMenu(directoryPage).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+                var arrayEntries = directoryPage.Split('#');
+                foreach (var entry in arrayEntries)
+                {
+                    if (entry.Contains("<Name>"))
+                    {
+                        var entryFixed = entry.Replace("<Name>", string.Empty)
+                                              .Replace("</Name>", "#")
+                                              .Replace("</Telephone>", string.Empty)
+                                              .Replace("<Telephone>", string.Empty);
+
+                        var arrayEntry = entryFixed.Split('#');
+                        var IpEntry = new IPPhoneDirectoryEntry();
+                        IpEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                        IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+                        list.Add(IpEntry);
+                    }
+                }
+                interruptionLoopTooLong++;
+            }
+            return list;
         }
     }
 }
