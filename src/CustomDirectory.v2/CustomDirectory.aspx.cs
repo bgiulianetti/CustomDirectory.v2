@@ -24,8 +24,8 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = "supervisor";// Request.QueryString["l"];
-            var countryCode = "co";// Request.QueryString["p"];
+            var last = "su";// Request.QueryString["l"];
+            var countryCode = "cl";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -53,6 +53,7 @@ namespace CustomDirectory.v2
                     try
                     {
                         stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country.Name, start);
+                        //agregar un filtro para excluir a paises de colombia, paraguay y uruguay
                         xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
@@ -640,10 +641,12 @@ namespace CustomDirectory.v2
                 throw new Exception(ex.Message);
             }
 
-            IpPhoneDirectory.DirectoryEntries = listEntries;
-            IpPhoneDirectory.EntriesCount = listEntries.Count;
-            list.Add(IpPhoneDirectory);
-
+            if (listEntries.Count > 0)
+            {
+                IpPhoneDirectory.DirectoryEntries = listEntries;
+                IpPhoneDirectory.EntriesCount = listEntries.Count;
+                list.Add(IpPhoneDirectory);
+            }
             return list;
         }
 
