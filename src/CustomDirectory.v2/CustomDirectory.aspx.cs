@@ -53,7 +53,10 @@ namespace CustomDirectory.v2
                     try
                     {
                         stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country.Name, start);
+                        //TO DO!!!
                         //agregar un filtro para excluir a paises de colombia, paraguay y uruguay
+                        //o como otra estrategia
+                        //averiguar los prefijos de chile y hacer una busqueda por ese numero
                         xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
@@ -717,6 +720,11 @@ namespace CustomDirectory.v2
                 interruptionLoopTooLong++;
             }
             return list;
+        }
+
+        private string RemoveCountriesFrom_CO_PE_UY(string directoryPage)
+        {
+            return "";
         }
     }
 }
