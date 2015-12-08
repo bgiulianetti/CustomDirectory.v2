@@ -100,10 +100,18 @@ namespace CustomDirectory.v2
                 try
                 {
                     directories = GetAllDirectories(first, last, number, start);
-                    var allEntries = GetEntriesOrderedAndWithPrefix(directories);
-                    var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
-                    xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
-                    xmlOutput = FixAccentuation(xmlOutput);
+                    if (directories.Count > 0)
+                    {
+                        var allEntries = GetEntriesOrderedAndWithPrefix(directories);
+                        var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
+                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
+                        xmlOutput = FixAccentuation(xmlOutput);
+                    }
+                    else
+                    {
+                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
+                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -359,9 +367,12 @@ namespace CustomDirectory.v2
                     throw new Exception(ex.Message);
                 }
 
-                IpPhoneDirectory.DirectoryEntries = listEntries;
-                IpPhoneDirectory.EntriesCount = listEntries.Count;
-                list.Add(IpPhoneDirectory);
+                if(listEntries.Count > 0)
+                {
+                    IpPhoneDirectory.DirectoryEntries = listEntries;
+                    IpPhoneDirectory.EntriesCount = listEntries.Count;
+                    list.Add(IpPhoneDirectory);
+                }
             }
             return list;
         }
@@ -679,23 +690,25 @@ namespace CustomDirectory.v2
 
                 if (!directoryPage.Contains("<Name>Next</Name>"))
                     isEmpty = true;
-
-                directoryPage = DeleteBottomMenu(directoryPage).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
-                var arrayEntries = directoryPage.Split('#');
-                foreach (var entry in arrayEntries)
+                if (directoryPage.Contains("<DirectoryEntry>"))
                 {
-                    if (entry.Contains("<Name>"))
+                    directoryPage = DeleteBottomMenu(directoryPage).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+                    var arrayEntries = directoryPage.Split('#');
+                    foreach (var entry in arrayEntries)
                     {
-                        var entryFixed = entry.Replace("<Name>", string.Empty)
-                                              .Replace("</Name>", "#")
-                                              .Replace("</Telephone>", string.Empty)
-                                              .Replace("<Telephone>", string.Empty);
+                        if (entry.Contains("<Name>"))
+                        {
+                            var entryFixed = entry.Replace("<Name>", string.Empty)
+                                                  .Replace("</Name>", "#")
+                                                  .Replace("</Telephone>", string.Empty)
+                                                  .Replace("<Telephone>", string.Empty);
 
-                        var arrayEntry = entryFixed.Split('#');
-                        var IpEntry = new IPPhoneDirectoryEntry();
-                        IpEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
-                        IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
-                        list.Add(IpEntry);
+                            var arrayEntry = entryFixed.Split('#');
+                            var IpEntry = new IPPhoneDirectoryEntry();
+                            IpEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                            IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+                            list.Add(IpEntry);
+                        }
                     }
                 }
                 interruptionLoopTooLong++;
