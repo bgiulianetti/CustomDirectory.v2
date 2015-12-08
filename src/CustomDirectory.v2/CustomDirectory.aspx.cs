@@ -24,8 +24,8 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = Request.QueryString["l"];
-            var countryCode = Request.QueryString["p"];
+            var last = "supervisor";// Request.QueryString["l"];
+            var countryCode = "co";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -38,14 +38,14 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
-            //Pais especifico
+            //Pais Especifico
             if (countryCode != string.Empty && countryCode != "co" && countryCode != "uy" && countryCode != "pe")
             {
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
                 {
-                    xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + "_ErrorNoMartches"),
-                                                   ConfigurationManager.AppSettings.Get(language + "_InvalidCountryCode"));
+                    xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"),
+                                                   ConfigurationManager.AppSettings.Get(language + ".InvalidCountryCode"));
                 }
                 else
                 {
@@ -62,26 +62,36 @@ namespace CustomDirectory.v2
                     }
                 }
             }
-            // colombia peru o uruguay
+            // Colombia - Peru - Uruguay
             else if (countryCode != string.Empty && countryCode == "co" || countryCode == "uy" || countryCode == "pe")
             {
-                ///////////////////
                 var directories = new List<IPPhoneDirectory>();
                 try
                 {
                     var country = GetCountryByCode(countryCode);
-                    var ArrNumber = ConfigurationManager.AppSettings.Get(country.Name + "_Prefix").Split('-');
+                    var ArrNumber = ConfigurationManager.AppSettings.Get(country.Name + ".Prefix").Split('-');
                     foreach (var itemNumber in ArrNumber)
                     {
                         directories.AddRange(GetAllDirectories_CO_PE_UY(first, last, itemNumber, start, country));
+                    }
+                    if (directories.Count > 0)
+                    {
+                        var allEntries = GetEntriesOrderedAndWithPrefix(directories);
+                        var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
+                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
+                        xmlOutput = FixAccentuation(xmlOutput);
+                    }
+                    else
+                    {
+                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
+                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
                     }
                     
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    xmlOutput = FormatErrorMessage("Error", ex.Message);
                 }
-                ///////////////////
             }
             //Todos los paises
             else if (countryCode == string.Empty)
@@ -139,7 +149,7 @@ namespace CustomDirectory.v2
                     throw new Exception(ex.Message);
                 }
                 if (!response.IsSuccessStatusCode)
-                    throw new Exception(response.ReasonPhrase + " " + ConfigurationManager.AppSettings.Get(GetLanguageApplication() + "_GettingCountry") + ": " + countryName);
+                    throw new Exception(response.ReasonPhrase + " " + ConfigurationManager.AppSettings.Get(GetLanguageApplication() + ".GettingCountry") + ": " + countryName);
             }
             return response.Content.ReadAsStringAsync().Result;
         }
@@ -227,9 +237,9 @@ namespace CustomDirectory.v2
         {
             var language = GetLanguageApplication();
             return stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ")
-                                  .Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + "_Records"))
-                                  .Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + "_To") + " ")
-                                  .Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + "_Of") + " ")
+                                  .Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"))
+                                  .Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ")
+                                  .Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ")
                                   .Replace("<Name>[" + country.Code + "] Dial", "<Name>Dial")
                                   .Replace("<Name>[" + country.Code + "] Search", "<Name>Search")
                                   .Replace("<Name>[" + country.Code + "] Exit", "<Name>Exit")
@@ -363,7 +373,7 @@ namespace CustomDirectory.v2
         /// <returns>string</returns>
         private string GetDirectoryUrlByCountry(string countryName)
         {
-            return ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName);
+            return ConfigurationManager.AppSettings.Get("UrlDirectory." + countryName);
         }
 
         /// <summary>
@@ -467,7 +477,7 @@ namespace CustomDirectory.v2
                     showNext = false;
                 }
             }
-            xmlOutput += "<Prompt>" + ConfigurationManager.AppSettings.Get(language + "_Records") + " " + start.ToString() + " a " + (entriesPerPage).ToString() + " de " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
+            xmlOutput += "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records") + " " + start.ToString() + " a " + (entriesPerPage).ToString() + " de " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
             xmlOutput += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
             xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
             xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
@@ -495,7 +505,7 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string GetUrlDirectoryByName(string countryName)
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory_" + countryName);
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory." + countryName);
         }
 
         /// <summary>
@@ -505,7 +515,7 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string GetUrlDirectoryLandingByName(string countryName)
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing_" + countryName);
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing." + countryName);
         }
 
         /// <summary>
