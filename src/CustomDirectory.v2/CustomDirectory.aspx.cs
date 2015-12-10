@@ -38,8 +38,8 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
-            //Pais Especifico
-            if (countryCode != string.Empty && countryCode != "co" && countryCode != "uy" && countryCode != "pe")
+            //Paises con Cluster Dedicados (Argentina - Brasil - Paraguay)
+            if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
             {
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
@@ -53,10 +53,6 @@ namespace CustomDirectory.v2
                     try
                     {
                         stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country.Name, start);
-                        //TO DO!!!
-                        //agregar un filtro para excluir a paises de colombia, paraguay y uruguay
-                        //o como otra estrategia
-                        //averiguar los prefijos de chile y hacer una busqueda por ese numero
                         xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
@@ -67,7 +63,7 @@ namespace CustomDirectory.v2
                 }
             }
             // Colombia - Peru - Uruguay
-            else if (countryCode != string.Empty && countryCode == "co" || countryCode == "uy" || countryCode == "pe")
+            else if (countryCode == "co" || countryCode == "pe" || countryCode == "uy")
             {
                 var directories = new List<IPPhoneDirectory>();
                 try
@@ -96,6 +92,11 @@ namespace CustomDirectory.v2
                 {
                     xmlOutput = FormatErrorMessage("Error", ex.Message);
                 }
+            }
+            //Chile
+            else if (countryCode == "cl")
+            {
+
             }
             //Todos los paises
             else if (countryCode == string.Empty)
@@ -725,6 +726,11 @@ namespace CustomDirectory.v2
         private string RemoveCountriesFrom_CO_PE_UY(string directoryPage)
         {
             return "";
+        }
+
+        private List<string> GetCountryCodesWithDedicatedCluster()
+        {
+            return ConfigurationManager.AppSettings.Get("Countries.DedicatedCluster").Split('-').ToList<string>();
         }
     }
 }

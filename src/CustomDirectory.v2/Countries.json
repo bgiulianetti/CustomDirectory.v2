@@ -1,0 +1,88 @@
+{[
+{
+ "Country":"Argentina",
+ "Code":"ar",
+ "InternalPrefix":"",
+ "ExternalPrefix":""
+},
+{
+ "Country":"Chile",
+ "Code":"cl",
+ "internalPrefix":"",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Paraguay",
+ "Code":"py",
+ "InternalPrefix":"",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Brasil",
+ "Code":"br",
+ "InternalPrefix":"",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Estados Unidos",
+ "Code":"us",
+ "InternalPrefix":"5",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Colombia",
+ "Code":"co",
+ "InternalPrefix":"71-72",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Peru",
+ "Code":"pe",
+ "InternalPrefix":"73-74",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Uruguay",
+ "Code":"uy",
+ "InternalPrefix":"751-752",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Mexico",
+ "Code":"mx",
+ "InternalPrefix":"51",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Venezuela",
+ "Code":"ve",
+ "InternalPrefix":"754",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Bolivia",
+ "Code":"bo",
+ "InternalPrefix":"753",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"España",
+ "Code":"es",
+ "InternalPrefix":"634-635-636-637",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Holanda",
+ "Code":"nl",
+ "InternalPrefix"."624-625",
+ "ExternalPrefix":"*18"
+},
+{
+ "Country":"Francia",
+ "Code":"fr",
+ "InternalPrefix":"620-621",
+ "ExternalPrefix":"*18"
+}
+
+
+]}
