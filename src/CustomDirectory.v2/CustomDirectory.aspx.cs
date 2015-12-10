@@ -728,6 +728,8 @@ namespace CustomDirectory.v2
             return list;
         }
 
+
+        //Refactor de estos metodos. Tomar los datos desde el json
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
             return ConfigurationManager.AppSettings.Get("Countries.DedicatedCluster").Split('-').ToList<string>();
@@ -754,6 +756,20 @@ namespace CustomDirectory.v2
                     listCountry.Add(country);
             }
             return listCountry;
+        }
+
+        private List<Country> GetAvailableCountriesFromJson()
+        {
+            using (StreamReader r = new StreamReader("Countries.Metadata/" + ))
+            {
+                string json = r.ReadToEnd();
+                List<Country> items = JsonConvert.DeserializeObject<List<Country>>(json);
+            }
+        }
+
+        private string GetCountriesFileName()
+        {
+            ConfigurationManager.AppSettings.Get("");
         }
     }
 }
