@@ -3,102 +3,119 @@
         "Country": "Argentina",
         "Code": "ar",
         "InternalPrefix": "",
-        "ExternalPrefix": ""
+        "ExternalPrefix": "",
+        "Cluster": "Argentina"
     },
     {
         "Country": "Chile",
         "Code": "cl",
         "internalPrefix": "",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "Paraguay",
         "Code": "py",
         "InternalPrefix": "",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "Paraguay"
     },
     {
         "Country": "Brasil",
         "Code": "br",
         "InternalPrefix": "",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "Brasil"
     },
     {
         "Country": "Estados Unidos",
         "Code": "us",
         "InternalPrefix": "5",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoNorte"
     },
     {
         "Country": "Colombia",
         "Code": "co",
         "InternalPrefix": "71-72",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "Peru",
         "Code": "pe",
         "InternalPrefix": "73-74",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "Uruguay",
         "Code": "uy",
         "InternalPrefix": "751-752",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "Mexico",
         "Code": "mx",
         "InternalPrefix": "51",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoNorte"
     },
     {
         "Country": "Venezuela",
         "Code": "ve",
         "InternalPrefix": "754",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "Bolivia",
         "Code": "bo",
         "InternalPrefix": "753",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "España",
         "Code": "es",
         "InternalPrefix": "634-635-636-637",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoNorte"
     },
     {
         "Country": "Holanda",
         "Code": "nl",
-        "InternalPrefix"."624-625",
-        "ExternalPrefix": "*18"
+        "InternalPrefix": "624-625",
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoNorte"
     },
     {
         "Country": "Francia",
         "Code": "fr",
         "InternalPrefix": "620-621",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoNorte"
     },
     {
         "Country": "Reino Unido",
         "Code": "uk",
         "InternalPrefix": "622-623",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoNorte"
     },
     {
         "Country": "Alemania",
         "Code": "de",
         "InternalPrefix": "648-649",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     },
     {
         "Country": "Australia",
         "Code": "au",
         "InternalPrefix": "760",
-        "ExternalPrefix": "*18"
+        "ExternalPrefix": "*18",
+        "Cluster": "ConoSur"
     }
 ]
