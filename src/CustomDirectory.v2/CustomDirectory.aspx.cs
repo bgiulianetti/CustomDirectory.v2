@@ -62,8 +62,8 @@ namespace CustomDirectory.v2
                     }
                 }
             }
-            // Colombia - Peru - Uruguay
-            else if (countryCode == "co" || countryCode == "pe" || countryCode == "uy")
+            // Paises con cluster compartido con prefijos (todos menos Chile)
+            else if (GetCountryCodesWithSharedClusterWithPrefixes().Contains(countryCode))
             {
                 var directories = new List<IPPhoneDirectory>();
                 try
@@ -72,7 +72,7 @@ namespace CustomDirectory.v2
                     var ArrNumber = ConfigurationManager.AppSettings.Get(country.Name + ".Prefix").Split('-');
                     foreach (var itemNumber in ArrNumber)
                     {
-                        directories.AddRange(GetAllDirectories_CO_PE_UY(first, last, itemNumber, start, country));
+                        directories.AddRange(GetAllDirectoriesForCountriesWithSharedClusterAndPrefixes(first, last, itemNumber, start, country));
                     }
                     if (directories.Count > 0)
                     {
@@ -94,11 +94,11 @@ namespace CustomDirectory.v2
                 }
             }
             //Chile
-            else if (countryCode == "cl")
+            else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
             {
 
             }
-            //Todos los paises
+            //Todos los paises de todos los clusters
             else if (countryCode == string.Empty)
             {
                 List<IPPhoneDirectory> directories = null;
@@ -177,9 +177,11 @@ namespace CustomDirectory.v2
             var arrCountries = ConfigurationManager.AppSettings.Get("Countries").Split('|');
             for (int i = 0; i < arrCountries.Count(); i++)
             {
-                var country = new Country(name: arrCountries[i].Split(':')[0],
-                                          code: arrCountries[i].Split(':')[1].ToUpper(),
-                                          prefix: arrCountries[i].Split(':')[2]);
+                var arrItem = arrCountries[i].Split(':');
+                var country = new Country(name: arrItem[0],
+                                          code: arrItem[1].ToUpper(),
+                                          internalPrefix: arrItem[2].Split('-').ToList<string>(),
+                                          externalPrefix: arrItem[3]);
                 countryList.Add(country);
             }
             return countryList;
@@ -258,7 +260,7 @@ namespace CustomDirectory.v2
                                   .Replace("<Name>[" + country.Code + "] Exit", "<Name>Exit")
                                   .Replace("<Name>[" + country.Code + "] EditDial", "<Name>EditDial")
                                   .Replace("<Name>[" + country.Code + "] Next", "<Name>Next")
-                                  .Replace("<Telephone>", "<Telephone>" + country.Prefix)
+                                  .Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix)
                                   .Replace("<URL>" + GetUrlDirectoryByName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
                                            "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>")
                                   .Replace(("<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
@@ -406,7 +408,7 @@ namespace CustomDirectory.v2
                 {
                     var entry = new IPPhoneDirectoryEntry();
                     entry.Name = "[" + dir.Country.Code + "] " + entryItem.Name;
-                    entry.Telephone = dir.Country.Prefix + entryItem.Telephone;
+                    entry.Telephone = dir.Country.ExternalPrefix + entryItem.Telephone;
                     listOrderedWithPrefixes.Add(entry);
                 }
             }
@@ -630,7 +632,7 @@ namespace CustomDirectory.v2
         /// <param name="number"></param>
         /// <param name="start"></param>
         /// <returns>List<IPPhoneDirectory></returns>
-        private List<IPPhoneDirectory> GetAllDirectories_CO_PE_UY(string first, string last, string number, string start, Country country)
+        private List<IPPhoneDirectory> GetAllDirectoriesForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string start, Country country)
         {
             var list = new List<IPPhoneDirectory>();
             var IpPhoneDirectory = new IPPhoneDirectory();
@@ -638,7 +640,7 @@ namespace CustomDirectory.v2
             List<IPPhoneDirectoryEntry> listEntries = null;
             try
             {
-                listEntries = GetDirectoryEntriesList_CO_PE_UY(first, last, number, country.Name, start);
+                listEntries = GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(first, last, number, country.Name, start);
             }
             catch (Exception ex)
             {
@@ -663,7 +665,7 @@ namespace CustomDirectory.v2
         /// <param name="country"></param>
         /// <param name="start"></param>
         /// <returns>List<IPPhoneDirectoryEntry></returns>
-        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesList_CO_PE_UY(string first, string last, string number, string country, string start)
+        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string country, string start)
         {
             var list = new List<IPPhoneDirectoryEntry>();
 
@@ -723,14 +725,19 @@ namespace CustomDirectory.v2
             return list;
         }
 
-        private string RemoveCountriesFrom_CO_PE_UY(string directoryPage)
-        {
-            return "";
-        }
-
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
             return ConfigurationManager.AppSettings.Get("Countries.DedicatedCluster").Split('-').ToList<string>();
+        }
+
+        private List<string> GetCountryCodesWithSharedClusterWithPrefixes()
+        {
+            return ConfigurationManager.AppSettings.Get("Countries.SharedClusterWithPrefixes").Split('-').ToList<string>();
+        }
+
+        private List<string> GetCountryCodesWithSharedClusterWithOutPrefixes()
+        {
+            return ConfigurationManager.AppSettings.Get("Countries.SharedClusterWithOutPrefixes").Split('-').ToList<string>();
         }
     }
 }

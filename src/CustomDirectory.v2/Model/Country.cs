@@ -9,9 +9,8 @@ namespace CustomDirectory.v2.Model
     {
         public const string INVALID_NAME = "Invalid name";
         public const string INVALID_CODE = "Invalid code";
-        public const string INVALID_PREFIX = "Invalid prefix";
 
-        public Country(string name, string code, string prefix)
+        public Country(string name, string code, List<string> internalPrefix, string externalPrefix)
         {
             if (string.IsNullOrEmpty(name))
                 throw new Exception(INVALID_NAME);
@@ -19,16 +18,16 @@ namespace CustomDirectory.v2.Model
             if (string.IsNullOrEmpty(code))
                 throw new Exception(INVALID_CODE);
 
-            if (prefix == null)
-                throw new Exception(INVALID_PREFIX);
-
             Name = name;
             Code = code;
-            Prefix = prefix;
+            InternalPrefix = internalPrefix;
+            ExternalPrefix = externalPrefix;
+
         }
 
         public string Name { get; set; }
         public string Code { get; set; }
-        public string Prefix { get; set; }
+        public List<string> InternalPrefix { get; set; }
+        public string ExternalPrefix { get; set; }
     }
 }

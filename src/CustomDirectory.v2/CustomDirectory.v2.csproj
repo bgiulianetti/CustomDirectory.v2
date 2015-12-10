@@ -104,6 +104,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Countries.json" />
     <None Include="Properties\PublishProfiles\pub.pubxml" />
     <None Include="Web.AR.config">
       <DependentUpon>Web.config</DependentUpon>
