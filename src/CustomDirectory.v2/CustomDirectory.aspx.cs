@@ -24,8 +24,8 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = "su";// Request.QueryString["l"];
-            var countryCode = "cl";// Request.QueryString["p"];
+            var last = Request.QueryString["l"];
+            var countryCode = "ar";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -62,7 +62,7 @@ namespace CustomDirectory.v2
                     }
                 }
             }
-            // Paises con cluster compartido con prefijos (todos menos Chile)
+            // Paises con prefijos con cluster compartido (todos menos Chile)
             else if (GetCountryCodesWithSharedClusterWithPrefixes().Contains(countryCode))
             {
                 var directories = new List<IPPhoneDirectory>();
@@ -93,7 +93,7 @@ namespace CustomDirectory.v2
                     xmlOutput = FormatErrorMessage("Error", ex.Message);
                 }
             }
-            //Chile
+            //Paises sin prefijo con cluster compartido
             else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
             {
 
