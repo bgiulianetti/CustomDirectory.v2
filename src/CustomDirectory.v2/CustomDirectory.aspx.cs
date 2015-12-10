@@ -25,7 +25,7 @@ namespace CustomDirectory.v2
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "ar";// Request.QueryString["p"];
+            var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -96,7 +96,9 @@ namespace CustomDirectory.v2
             //Paises sin prefijo con cluster compartido
             else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
             {
-
+                //To Do !!
+                //corro el metodo de obtener los paises de mi mismo cluster, y con sus prefijos voy descartando los que no van, 
+                //los resultantes van a ser los que tengo que utilizar
             }
             //Todos los paises de todos los clusters
             else if (countryCode == string.Empty)
@@ -181,7 +183,8 @@ namespace CustomDirectory.v2
                 var country = new Country(name: arrItem[0],
                                           code: arrItem[1].ToUpper(),
                                           internalPrefix: arrItem[2].Split('-').ToList<string>(),
-                                          externalPrefix: arrItem[3]);
+                                          externalPrefix: arrItem[3],
+                                          cluster: arrItem[4]);
                 countryList.Add(country);
             }
             return countryList;
@@ -738,6 +741,19 @@ namespace CustomDirectory.v2
         private List<string> GetCountryCodesWithSharedClusterWithOutPrefixes()
         {
             return ConfigurationManager.AppSettings.Get("Countries.SharedClusterWithOutPrefixes").Split('-').ToList<string>();
+        }
+
+        private List<Country> GetCountriesFromSameCluster(string countryCode)
+        {
+            var myCluster = GetCountryByCode(countryCode).Cluster;
+            var listCountry = new List<Country>();
+            var countries = GetAvailableCountries();
+            foreach (var country in countries)
+            {
+                if (country.Cluster == myCluster)
+                    listCountry.Add(country);
+            }
+            return listCountry;
         }
     }
 }
