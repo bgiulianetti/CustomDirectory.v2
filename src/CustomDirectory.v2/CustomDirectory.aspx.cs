@@ -13,6 +13,7 @@ using CustomDirectory.v2.Model;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Configuration;
+using Newtonsoft.Json;
 
 namespace CustomDirectory.v2
 {
@@ -20,6 +21,7 @@ namespace CustomDirectory.v2
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            var result = GetAvailableCountriesFromJson();
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
@@ -760,16 +762,17 @@ namespace CustomDirectory.v2
 
         private List<Country> GetAvailableCountriesFromJson()
         {
-            using (StreamReader r = new StreamReader("Countries.Metadata/" + ))
+            using (StreamReader r = new StreamReader(GetCountriesJsonFileName()))
             {
                 string json = r.ReadToEnd();
                 List<Country> items = JsonConvert.DeserializeObject<List<Country>>(json);
+                return items;
             }
         }
 
-        private string GetCountriesFileName()
+        private string GetCountriesJsonFileName()
         {
-            ConfigurationManager.AppSettings.Get("");
+            return ConfigurationManager.AppSettings.Get("Countries.JsonFileName");
         }
     }
 }
