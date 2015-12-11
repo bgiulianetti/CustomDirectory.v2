@@ -1,120 +1,120 @@
 [
     {
-        "Country": "Argentina",
+        "Name": "Argentina",
         "Code": "ar",
-        "InternalPrefix": "",
+        "InternalPrefix": [],
         "ExternalPrefix": "",
         "Cluster": "Argentina"
     },
     {
-        "Country": "Chile",
+        "Name": "Chile",
         "Code": "cl",
-        "internalPrefix": "",
+        "internalPrefix": [],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "Paraguay",
+        "Name": "Paraguay",
         "Code": "py",
-        "InternalPrefix": "",
+        "InternalPrefix": [],
         "ExternalPrefix": "*18",
         "Cluster": "Paraguay"
     },
     {
-        "Country": "Brasil",
+        "Name": "Brasil",
         "Code": "br",
-        "InternalPrefix": "",
+        "InternalPrefix": [],
         "ExternalPrefix": "*18",
         "Cluster": "Brasil"
     },
     {
-        "Country": "Estados Unidos",
+        "Name": "Estados Unidos",
         "Code": "us",
-        "InternalPrefix": "5",
+        "InternalPrefix": ["5"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoNorte"
     },
     {
-        "Country": "Colombia",
+        "Name": "Colombia",
         "Code": "co",
-        "InternalPrefix": "71-72",
+        "InternalPrefix": ["71", "72"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "Peru",
+        "Name": "Peru",
         "Code": "pe",
-        "InternalPrefix": "73-74",
+        "InternalPrefix": ["73","74"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "Uruguay",
+        "Name": "Uruguay",
         "Code": "uy",
-        "InternalPrefix": "751-752",
+        "InternalPrefix": ["751", "752"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "Mexico",
+        "Name": "Mexico",
         "Code": "mx",
-        "InternalPrefix": "51",
+        "InternalPrefix": ["51"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoNorte"
     },
     {
-        "Country": "Venezuela",
+        "Name": "Venezuela",
         "Code": "ve",
-        "InternalPrefix": "754",
+        "InternalPrefix": ["754"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "Bolivia",
+        "Name": "Bolivia",
         "Code": "bo",
-        "InternalPrefix": "753",
+        "InternalPrefix": ["753"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "España",
+        "Name": "España",
         "Code": "es",
-        "InternalPrefix": "634-635-636-637",
+        "InternalPrefix": ["634", "635", "636", "637"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoNorte"
     },
     {
-        "Country": "Holanda",
+        "Name": "Holanda",
         "Code": "nl",
-        "InternalPrefix": "624-625",
+        "InternalPrefix": ["624", "625"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoNorte"
     },
     {
-        "Country": "Francia",
+        "Name": "Francia",
         "Code": "fr",
-        "InternalPrefix": "620-621",
+        "InternalPrefix": ["620", "621"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoNorte"
     },
     {
-        "Country": "Reino Unido",
+        "Name": "Reino Unido",
         "Code": "uk",
-        "InternalPrefix": "622-623",
+        "InternalPrefix": ["622", "623"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoNorte"
     },
     {
-        "Country": "Alemania",
+        "Name": "Alemania",
         "Code": "de",
-        "InternalPrefix": "648-649",
+        "InternalPrefix": ["648", "649"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     },
     {
-        "Country": "Australia",
+        "Name": "Australia",
         "Code": "au",
-        "InternalPrefix": "760",
+        "InternalPrefix": ["760"],
         "ExternalPrefix": "*18",
         "Cluster": "ConoSur"
     }

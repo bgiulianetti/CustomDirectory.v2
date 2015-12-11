@@ -21,7 +21,6 @@ namespace CustomDirectory.v2
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            var result = GetAvailableCountriesFromJson();
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
@@ -172,34 +171,13 @@ namespace CustomDirectory.v2
         }
 
         /// <summary>
-        /// Gets From the Web.Config all available countries with its names, codes, and prefies
-        /// </summary>
-        /// <returns>List<Country></returns>
-        private List<Country> GetAvailableCountries()
-        {
-            List<Country> countryList = new List<Country>();
-            var arrCountries = ConfigurationManager.AppSettings.Get("Countries").Split('|');
-            for (int i = 0; i < arrCountries.Count(); i++)
-            {
-                var arrItem = arrCountries[i].Split(':');
-                var country = new Country(name: arrItem[0],
-                                          code: arrItem[1].ToUpper(),
-                                          internalPrefix: arrItem[2].Split('-').ToList<string>(),
-                                          externalPrefix: arrItem[3],
-                                          cluster: arrItem[4]);
-                countryList.Add(country);
-            }
-            return countryList;
-        }
-
-        /// <summary>
         /// Gets the name of a country by it´s code
         /// </summary>
         /// <param name="countryCode"></param>
         /// <returns></returns>
         private Country GetCountryByCode(string countryCode)
         {
-            var countries = GetAvailableCountries();
+            var countries = GetAvailableCountriesFromJsonFile();
             foreach (var countryItem in countries)
             {
                 if (string.Equals(countryCode, countryItem.Code, StringComparison.InvariantCultureIgnoreCase))
@@ -364,7 +342,7 @@ namespace CustomDirectory.v2
         private List<IPPhoneDirectory> GetAllDirectories(string first, string last, string number, string start)
         {
             var list = new List<IPPhoneDirectory>();
-            var countries = GetAvailableCountries();
+            var countries = GetAvailableCountriesFromJsonFile();
             foreach (var itemCountry in countries)
             {
                 var IpPhoneDirectory = new IPPhoneDirectory();
@@ -731,7 +709,7 @@ namespace CustomDirectory.v2
         }
 
 
-        //Refactor de estos metodos. Tomar los datos desde el json
+        //Refactor de estos metodos.
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
             return ConfigurationManager.AppSettings.Get("Countries.DedicatedCluster").Split('-').ToList<string>();
@@ -751,7 +729,7 @@ namespace CustomDirectory.v2
         {
             var myCluster = GetCountryByCode(countryCode).Cluster;
             var listCountry = new List<Country>();
-            var countries = GetAvailableCountries();
+            var countries = GetAvailableCountriesFromJsonFile();
             foreach (var country in countries)
             {
                 if (country.Cluster == myCluster)
@@ -760,9 +738,9 @@ namespace CustomDirectory.v2
             return listCountry;
         }
 
-        private List<Country> GetAvailableCountriesFromJson()
+        private List<Country> GetAvailableCountriesFromJsonFile()
         {
-            using (StreamReader r = new StreamReader(GetCountriesJsonFileName()))
+            using (StreamReader r = new StreamReader(Server.MapPath("~/Countries.Metadata/" + GetCountriesJsonFileName())))
             {
                 string json = r.ReadToEnd();
                 List<Country> items = JsonConvert.DeserializeObject<List<Country>>(json);
