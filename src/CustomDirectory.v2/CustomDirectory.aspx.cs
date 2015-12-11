@@ -712,7 +712,11 @@ namespace CustomDirectory.v2
         //Refactor de estos metodos.
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
-            return ConfigurationManager.AppSettings.Get("Countries.DedicatedCluster").Split('-').ToList<string>();
+            var countries = GetAvailableCountriesFromJsonFile();
+            foreach (var country in countries)
+            {
+                
+            }
         }
 
         private List<string> GetCountryCodesWithSharedClusterWithPrefixes()
