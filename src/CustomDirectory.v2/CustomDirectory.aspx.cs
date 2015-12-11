@@ -24,9 +24,9 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = "alex";// Request.QueryString["f"];
+            var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = Request.QueryString["p"];
+            var countryCode = "ar";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -107,26 +107,40 @@ namespace CustomDirectory.v2
                 //TO DO!!
                 //La busqueda multi paises debe hacerse por cluster y no por pais, porque sino voy a tener registros repetidos.
                 //busco por cluster y una vez que tengo todos los contactos le pongo a cada uno el pais de acuerdo al cluster y al prefijo
-                List<IPPhoneDirectory> directories = null;
-                try
+
+                var clusters = GetAvailableClusters();
+                if (clusters.Count > 0)
                 {
-                    directories = GetAllDirectories(first, last, number, start);
-                    if (directories.Count > 0)
-                    {
-                        var allEntries = GetEntriesOrderedAndWithPrefix(directories);
-                        var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
-                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
-                        xmlOutput = FixAccentuation(xmlOutput);
-                    }
-                    else
-                    {
-                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
-                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
-                    }
+
                 }
-                catch (Exception ex)
+
+
+                if (1 == 0)
                 {
-                    xmlOutput = FormatErrorMessage("Error", ex.Message);
+                    #region Codigo Viejo
+                    //List<IPPhoneDirectory> directories = null;
+                    //try
+                    //{
+                    //    directories = GetAllDirectories(first, last, number, start);
+                    //    if (directories.Count > 0)
+                    //    {
+                    //        var allEntries = GetEntriesOrderedAndWithPrefix(directories);
+                    //        var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
+                    //        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
+                    //        xmlOutput = FixAccentuation(xmlOutput);
+                    //    }
+                    //    else
+                    //    {
+                    //        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
+                    //                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                    //    }
+                    //}
+
+                    //catch (Exception ex)
+                    //{
+                    //    xmlOutput = FormatErrorMessage("Error", ex.Message);
+                    //}
+                    #endregion
                 }
             }
             Response.ContentType = "text/xml";
@@ -388,9 +402,9 @@ namespace CustomDirectory.v2
         /// <returns>string</returns>
         private string GetDirectoryUrlByCountry(string countryName)
         {
-            var cluster = GetCountryByName(countryName).Cluster;
+            var clusterName = GetCountryByName(countryName).Cluster;
             var url = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
-            return string.Format(url, GetIpAdressFromCluster(cluster));
+            return string.Format(url, GetIpAdressFromCluster(clusterName));
         }
 
         /// <summary>
@@ -522,7 +536,11 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string GetUrlDirectoryByName(string countryName)
         {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory." + countryName);
+            var clusterName = GetCountryByName(countryName).Cluster;
+
+            var format = System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
+            return string.Format(format, clusterName);
+
         }
 
         /// <summary>
@@ -724,8 +742,6 @@ namespace CustomDirectory.v2
             return list;
         }
 
-
-
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
             var countries = GetAvailableCountriesFromJsonFile();
@@ -817,9 +833,31 @@ namespace CustomDirectory.v2
             return ConfigurationManager.AppSettings.Get("Countries.JsonFileName");
         }
 
-        private string GetIpAdressFromCluster(string cluster)
+        private string GetIpAdressFromCluster(string clusterName)
         {
-            return ConfigurationManager.AppSettings.Get(cluster + ".IPAdresss");
+            var cluster = GetClusterByName(clusterName);
+            return cluster.IPAdress;
+        }
+
+        private List<Cluster> GetAvailableClusters()
+        {
+            using (StreamReader r = new StreamReader(Server.MapPath("~/Countries.Metadata/" + GetCountriesJsonFileName())))
+            {
+                string json = r.ReadToEnd();
+                List<Cluster> items = JsonConvert.DeserializeObject<List<Cluster>>(json);
+                return items;
+            }
+        }
+
+        private Cluster GetClusterByName(string clusterName)
+        {
+            var clusters = GetAvailableClusters();
+            foreach (var cluster in clusters)
+            {
+                if (cluster.Name == clusterName)
+                    return cluster;
+            }
+            return null;
         }
     }
 }

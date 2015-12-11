@@ -1,0 +1,22 @@
+﻿[
+    {
+        "Name": "ConoNorte",
+        "IPAdress": "10.13.149.10:8080"
+    },
+    {
+        "Name": "ConoSur",
+        "IPAdress": "10.11.75.10:8080"
+    },
+    {
+        "Name": "Argentina",
+        "IPAdress": "10.11.147.10:8080"
+    },
+    {
+        "Name": "Paraguay",
+        "IPAdress": "10.13.11.10:8080"
+    },
+    {
+        "Name": "Brasil",
+        "IPAdress": "10.7.250.231:8080"
+    }
+]

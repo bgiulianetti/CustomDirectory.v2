@@ -101,6 +101,7 @@
     <Compile Include="CustomDirectory.aspx.designer.cs">
       <DependentUpon>CustomDirectory.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Model\Cluster.cs" />
     <Compile Include="Model\Country.cs" />
     <Compile Include="Model\Directory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -108,8 +109,9 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
-    <EmbeddedResource Include="Countries.Metadata\Countries.ConoSur.json" />
     <None Include="Properties\PublishProfiles\pub.pubxml" />
+    <Content Include="Resources\Countries.Metadata\Countries.ConoSur.json" />
+    <Content Include="Resources\Clusters.json" />
     <None Include="Web.AR.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
