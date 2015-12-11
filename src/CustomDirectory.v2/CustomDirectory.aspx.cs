@@ -24,7 +24,7 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = Request.QueryString["f"];
+            var first = "alex";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -104,6 +104,9 @@ namespace CustomDirectory.v2
             //Todos los paises de todos los clusters
             else if (countryCode == string.Empty)
             {
+                //TO DO!!
+                //La busqueda multi paises debe hacerse por cluster y no por pais, porque sino voy a tener registros repetidos.
+                //busco por cluster y una vez que tengo todos los contactos le pongo a cada uno el pais de acuerdo al cluster y al prefijo
                 List<IPPhoneDirectory> directories = null;
                 try
                 {
@@ -181,6 +184,17 @@ namespace CustomDirectory.v2
             foreach (var countryItem in countries)
             {
                 if (string.Equals(countryCode, countryItem.Code, StringComparison.InvariantCultureIgnoreCase))
+                    return countryItem;
+            }
+            return null;
+        }
+
+        private Country GetCountryByName(string countryName)
+        {
+            var countries = GetAvailableCountriesFromJsonFile();
+            foreach (var countryItem in countries)
+            {
+                if (string.Equals(countryName, countryItem.Name, StringComparison.InvariantCultureIgnoreCase))
                     return countryItem;
             }
             return null;
@@ -374,7 +388,9 @@ namespace CustomDirectory.v2
         /// <returns>string</returns>
         private string GetDirectoryUrlByCountry(string countryName)
         {
-            return ConfigurationManager.AppSettings.Get("UrlDirectory." + countryName);
+            var cluster = GetCountryByName(countryName).Cluster;
+            var url = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
+            return string.Format(url, GetIpAdressFromCluster(cluster));
         }
 
         /// <summary>
@@ -709,24 +725,68 @@ namespace CustomDirectory.v2
         }
 
 
-        //Refactor de estos metodos.
+
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
             var countries = GetAvailableCountriesFromJsonFile();
+            var countryCodesList = new List<string>();
             foreach (var country in countries)
             {
-                
+                var isDedicated = true;
+                for (int i = 0; i < countries.Count; i++)
+                {
+                    if (country.Cluster == countries[i].Cluster && country.Name != countries[i].Name)
+                    {
+                        isDedicated = false;
+                        break;
+                    }
+                }
+                if (isDedicated)
+                    countryCodesList.Add(country.Code);
             }
+            return countryCodesList;
         }
 
         private List<string> GetCountryCodesWithSharedClusterWithPrefixes()
         {
-            return ConfigurationManager.AppSettings.Get("Countries.SharedClusterWithPrefixes").Split('-').ToList<string>();
+            var countries = GetAvailableCountriesFromJsonFile();
+            var countryCodesList = new List<string>();
+            foreach (var country in countries)
+            {
+                var isDedicated = true;
+                for (int i = 0; i < countries.Count; i++)
+                {
+                    if (country.Cluster == countries[i].Cluster && country.Name != countries[i].Name)
+                    {
+                        isDedicated = false;
+                        break;
+                    }
+                }
+                if (!isDedicated && country.InternalPrefix.Count > 0)
+                    countryCodesList.Add(country.Code);
+            }
+            return countryCodesList;
         }
 
         private List<string> GetCountryCodesWithSharedClusterWithOutPrefixes()
         {
-            return ConfigurationManager.AppSettings.Get("Countries.SharedClusterWithOutPrefixes").Split('-').ToList<string>();
+            var countries = GetAvailableCountriesFromJsonFile();
+            var countryCodesList = new List<string>();
+            foreach (var country in countries)
+            {
+                var isDedicated = true;
+                for (int i = 0; i < countries.Count; i++)
+                {
+                    if (country.Cluster == countries[i].Cluster && country.Name != countries[i].Name)
+                    {
+                        isDedicated = false;
+                        break;
+                    }
+                }
+                if (!isDedicated && country.InternalPrefix.Count == 0)
+                    countryCodesList.Add(country.Code);
+            }
+            return countryCodesList;
         }
 
         private List<Country> GetCountriesFromSameCluster(string countryCode)
@@ -755,6 +815,11 @@ namespace CustomDirectory.v2
         private string GetCountriesJsonFileName()
         {
             return ConfigurationManager.AppSettings.Get("Countries.JsonFileName");
+        }
+
+        private string GetIpAdressFromCluster(string cluster)
+        {
+            return ConfigurationManager.AppSettings.Get(cluster + ".IPAdresss");
         }
     }
 }
