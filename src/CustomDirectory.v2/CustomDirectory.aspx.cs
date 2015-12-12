@@ -356,11 +356,11 @@ namespace CustomDirectory.v2
             foreach (var itemCluster in clusters)
             {
                 var IpPhoneDirectory = new IPPhoneDirectory();
-                //IpPhoneDirectory.Country = itemCountry;
+                IpPhoneDirectory.Country = null;// itemCountry;
                 List<IPPhoneDirectoryEntry> listEntries = null;
                 try
                 {
-                    listEntries = GetDirectoryEntriesList(first, last, number, itemCountry.Name, start);
+                    listEntries = GetDirectoryEntriesList(first, last, number, ""/*itemCountry.Name*/, start);
                 }
                 catch (Exception ex)
                 {
@@ -519,8 +519,9 @@ namespace CustomDirectory.v2
         private string GetUrlDirectoryByCountryName(string countryName)
         {
             var clusterName = GetCountryByName(countryName).Cluster;
+            var cluster = GetClusterByName(clusterName);
             var format = System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
-            return string.Format(format, clusterName);
+            return string.Format(format, cluster.IPAdress);
 
         }
 
@@ -532,8 +533,9 @@ namespace CustomDirectory.v2
         private string GetUrlDirectoryLandingByName(string countryName)
         {
             var clusterName = GetCountryByName(countryName).Cluster;
+            var cluster = GetClusterByName(clusterName);
             var format = System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing.Format");
-            return string.Format(format, clusterName);
+            return string.Format(format, cluster.IPAdress);
         }
 
         /// <summary>
@@ -803,7 +805,7 @@ namespace CustomDirectory.v2
 
         private List<Country> GetAvailableCountriesFromJsonFile()
         {
-            using (StreamReader r = new StreamReader(Server.MapPath("~/Countries.Metadata/" + GetCountriesJsonFileName())))
+            using (StreamReader r = new StreamReader(Server.MapPath("~/Resources/Countries.Metadata/" + GetCountriesFileName())))
             {
                 string json = r.ReadToEnd();
                 List<Country> items = JsonConvert.DeserializeObject<List<Country>>(json);
@@ -811,9 +813,14 @@ namespace CustomDirectory.v2
             }
         }
 
-        private string GetCountriesJsonFileName()
+        private string GetCountriesFileName()
         {
-            return ConfigurationManager.AppSettings.Get("Countries.JsonFileName");
+            return ConfigurationManager.AppSettings.Get("Countries.FileName");
+        }
+
+        private string GetClustersFileName()
+        {
+            return ConfigurationManager.AppSettings.Get("Clusters.FileName");
         }
 
         private string GetIpAdressFromCluster(string clusterName)
@@ -824,7 +831,7 @@ namespace CustomDirectory.v2
 
         private List<Cluster> GetAvailableClusters()
         {
-            using (StreamReader r = new StreamReader(Server.MapPath("~/Countries.Metadata/" + GetCountriesJsonFileName())))
+            using (StreamReader r = new StreamReader(Server.MapPath("~/Resources/" + GetClustersFileName())))
             {
                 string json = r.ReadToEnd();
                 List<Cluster> items = JsonConvert.DeserializeObject<List<Cluster>>(json);

@@ -11,7 +11,7 @@ namespace CustomDirectory.v2.Model
         public const string INVALID_CODE = "Invalid code";
         public const string INVALID_CLUSTER = "Invalid cluster";
 
-        public Country(string name, string code, List<string> internalPrefix, string externalPrefix, string cluster)
+        public Country(string name, string code, List<string> internalPrefix, string externalPrefix, string cluster, string numberLength)
         {
             if (string.IsNullOrEmpty(name))
                 throw new Exception(INVALID_NAME);
@@ -27,6 +27,7 @@ namespace CustomDirectory.v2.Model
             InternalPrefix = internalPrefix;
             ExternalPrefix = externalPrefix;
             Cluster = cluster;
+            NumberLength = numberLength;
 
         }
 
@@ -35,5 +36,6 @@ namespace CustomDirectory.v2.Model
         public List<string> InternalPrefix { get; set; }
         public string ExternalPrefix { get; set; }
         public string Cluster { get; set; }
+        public string NumberLength { get; set; }
     }
 }

@@ -4,7 +4,7 @@
         "Code": "ar",
         "InternalPrefix": [],
         "ExternalPrefix": "*188",
-        "NumberLenth": "",
+        "NumberLength": "",
         "Cluster": "Argentina"
     },
     {
@@ -12,7 +12,7 @@
         "Code": "cl",
         "internalPrefix": [],
         "ExternalPrefix": "*18",
-        "NumberLenth": "",
+        "NumberLength": "",
         "Cluster": "ConoSur"
     },
     {
@@ -20,7 +20,7 @@
         "Code": "py",
         "InternalPrefix": [],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "Paraguay"
     },
     {
@@ -28,7 +28,7 @@
         "Code": "br",
         "InternalPrefix": ["1","3","4","5","7","8"],
         "ExternalPrefix": "*188",
-        "NumberLenth": "3",
+        "NumberLength": "3",
         "Cluster": "Brasil"
     },
     {
@@ -36,7 +36,7 @@
         "Code": "us",
         "InternalPrefix": ["5"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "4",
+        "NumberLength": "4",
         "Cluster": "ConoNorte"
     },
     {
@@ -44,7 +44,7 @@
         "Code": "co",
         "InternalPrefix": ["71", "72"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "3",
+        "NumberLength": "3",
         "Cluster": "ConoSur"
     },
     {
@@ -52,7 +52,7 @@
         "Code": "pe",
         "InternalPrefix": ["73","74"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "3",
+        "NumberLength": "3",
         "Cluster": "ConoSur"
     },
     {
@@ -60,7 +60,7 @@
         "Code": "uy",
         "InternalPrefix": ["751", "752"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoSur"
     },
     {
@@ -68,7 +68,7 @@
         "Code": "mx",
         "InternalPrefix": ["51"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "3",
+        "NumberLength": "3",
         "Cluster": "ConoNorte"
     },
     {
@@ -76,7 +76,7 @@
         "Code": "ve",
         "InternalPrefix": ["754"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoSur"
     },
     {
@@ -84,7 +84,7 @@
         "Code": "bo",
         "InternalPrefix": ["753"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoSur"
     },
     {
@@ -92,7 +92,7 @@
         "Code": "es",
         "InternalPrefix": ["634", "635", "636", "637"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoNorte"
     },
     {
@@ -100,7 +100,7 @@
         "Code": "nl",
         "InternalPrefix": ["624", "625"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "0",
+        "NumberLength": "0",
         "Cluster": "ConoNorte"
     },
     {
@@ -108,7 +108,7 @@
         "Code": "fr",
         "InternalPrefix": ["620", "621"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoNorte"
     },
     {
@@ -116,7 +116,7 @@
         "Code": "uk",
         "InternalPrefix": ["622", "623"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoNorte"
     },
     {
@@ -124,7 +124,7 @@
         "Code": "de",
         "InternalPrefix": ["648", "649"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoSur"
     },
     {
@@ -132,7 +132,7 @@
         "Code": "au",
         "InternalPrefix": ["760"],
         "ExternalPrefix": "*18",
-        "NumberLenth": "2",
+        "NumberLength": "2",
         "Cluster": "ConoSur"
     }
 ]
