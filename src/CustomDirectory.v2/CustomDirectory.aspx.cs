@@ -26,14 +26,26 @@ namespace CustomDirectory.v2
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "ar";// Request.QueryString["p"];
+            var countryCode = "uy";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
 
-            if (first == null) first = string.Empty;
-            if (last == null) last = string.Empty;
-            if (countryCode == null) countryCode = string.Empty;
+            if (first == null)
+                first = string.Empty;
+            else
+                first.ToLower();
+
+            if (last == null)
+                last = string.Empty;
+            else
+                last.ToLower();
+
+            if (countryCode == null)
+                countryCode = string.Empty;
+            else
+                countryCode.ToLower();
+
             if (number == null) number = string.Empty;
             if (start == null) start = "1";
             if (page == null) page = "1";
@@ -71,8 +83,7 @@ namespace CustomDirectory.v2
                 try
                 {
                     var country = GetCountryByCode(countryCode);
-                    var ArrNumber = ConfigurationManager.AppSettings.Get(country.Name + ".Prefix").Split('-');
-                    foreach (var itemNumber in ArrNumber)
+                    foreach (var itemNumber in country.InternalPrefix)
                     {
                         directories.AddRange(GetAllDirectoriesForCountriesWithSharedClusterAndPrefixes(first, last, itemNumber, start, country));
                     }
@@ -176,7 +187,7 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private Country GetCountryByCode(string countryCode)
         {
-            var countries = GetAvailableCountriesFromJsonFile();
+            var countries = GetAvailableCountries();
             foreach (var countryItem in countries)
             {
                 if (string.Equals(countryCode, countryItem.Code, StringComparison.InvariantCultureIgnoreCase))
@@ -187,7 +198,7 @@ namespace CustomDirectory.v2
 
         private Country GetCountryByName(string countryName)
         {
-            var countries = GetAvailableCountriesFromJsonFile();
+            var countries = GetAvailableCountries();
             foreach (var countryItem in countries)
             {
                 if (string.Equals(countryName, countryItem.Name, StringComparison.InvariantCultureIgnoreCase))
@@ -248,11 +259,11 @@ namespace CustomDirectory.v2
                                   .Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"))
                                   .Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ")
                                   .Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ")
-                                  .Replace("<Name>[" + country.Code + "] Dial", "<Name>Dial")
-                                  .Replace("<Name>[" + country.Code + "] Search", "<Name>Search")
-                                  .Replace("<Name>[" + country.Code + "] Exit", "<Name>Exit")
-                                  .Replace("<Name>[" + country.Code + "] EditDial", "<Name>EditDial")
-                                  .Replace("<Name>[" + country.Code + "] Next", "<Name>Next")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial")
+                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next")
                                   .Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix)
                                   .Replace("<URL>" + GetUrlDirectoryByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
                                            "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>")
@@ -386,7 +397,7 @@ namespace CustomDirectory.v2
         {
             var clusterName = GetCountryByName(countryName).Cluster;
             var url = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
-            return string.Format(url, GetIpAdressFromCluster(clusterName));
+            return string.Format(url, GetIpAdressFromClusterName(clusterName));
         }
 
         /// <summary>
@@ -729,7 +740,7 @@ namespace CustomDirectory.v2
 
         private List<string> GetCountryCodesWithDedicatedCluster()
         {
-            var countries = GetAvailableCountriesFromJsonFile();
+            var countries = GetAvailableCountries();
             var countryCodesList = new List<string>();
             foreach (var country in countries)
             {
@@ -750,7 +761,7 @@ namespace CustomDirectory.v2
 
         private List<string> GetCountryCodesWithSharedClusterWithPrefixes()
         {
-            var countries = GetAvailableCountriesFromJsonFile();
+            var countries = GetAvailableCountries();
             var countryCodesList = new List<string>();
             foreach (var country in countries)
             {
@@ -771,7 +782,7 @@ namespace CustomDirectory.v2
 
         private List<string> GetCountryCodesWithSharedClusterWithOutPrefixes()
         {
-            var countries = GetAvailableCountriesFromJsonFile();
+            var countries = GetAvailableCountries();
             var countryCodesList = new List<string>();
             foreach (var country in countries)
             {
@@ -794,7 +805,7 @@ namespace CustomDirectory.v2
         {
             var myCluster = GetCountryByCode(countryCode).Cluster;
             var listCountry = new List<Country>();
-            var countries = GetAvailableCountriesFromJsonFile();
+            var countries = GetAvailableCountries();
             foreach (var country in countries)
             {
                 if (country.Cluster == myCluster)
@@ -803,7 +814,7 @@ namespace CustomDirectory.v2
             return listCountry;
         }
 
-        private List<Country> GetAvailableCountriesFromJsonFile()
+        private List<Country> GetAvailableCountries()
         {
             using (StreamReader r = new StreamReader(Server.MapPath("~/Resources/Countries.Metadata/" + GetCountriesFileName())))
             {
@@ -823,7 +834,7 @@ namespace CustomDirectory.v2
             return ConfigurationManager.AppSettings.Get("Clusters.FileName");
         }
 
-        private string GetIpAdressFromCluster(string clusterName)
+        private string GetIpAdressFromClusterName(string clusterName)
         {
             var cluster = GetClusterByName(clusterName);
             return cluster.IPAdress;
