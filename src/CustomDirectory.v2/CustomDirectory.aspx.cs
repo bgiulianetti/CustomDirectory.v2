@@ -26,7 +26,7 @@ namespace CustomDirectory.v2
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "uy";// Request.QueryString["p"];
+            var countryCode = "ar";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -51,7 +51,7 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
-            //Paises con Cluster Dedicados (Argentina - Brasil - Paraguay)
+            //Paises con Cluster Dedicados
             if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
             {
                 var country = GetCountryByCode(countryCode);
@@ -65,7 +65,7 @@ namespace CustomDirectory.v2
                     var stringSinglePageDirectory = string.Empty;
                     try
                     {
-                        var url = GetUrlDirectoryByCountryName(country.Name);
+                        var url = GetClusterUrlByCountryName(country.Name);
                         stringSinglePageDirectory = GetStringSinglePageDirectory(new HttpClient(), first, last, number, url, start);
                         xmlOutput = FixFormatForSingleCountry(stringSinglePageDirectory, country, first, last, number, start);
                         xmlOutput = FixAccentuation(xmlOutput);
@@ -76,16 +76,18 @@ namespace CustomDirectory.v2
                     }
                 }
             }
-            // Paises con prefijos con cluster compartido (todos menos Chile)
+            // Paises con prefijos con cluster compartido
             else if (GetCountryCodesWithSharedClusterWithPrefixes().Contains(countryCode))
             {
                 var directories = new List<IPPhoneDirectory>();
                 try
                 {
                     var country = GetCountryByCode(countryCode);
+                    //var cluster = GetClusterByName(country.Cluster);
+                    var url = GetClusterUrlByCountryName(country.Name);
                     foreach (var itemNumber in country.InternalPrefix)
                     {
-                        directories.AddRange(GetAllDirectoriesForCountriesWithSharedClusterAndPrefixes(first, last, itemNumber, start, country));
+                        directories.AddRange(GetAllDirectoriesForCountriesWithSameClusterAndWithPrefixes(first, last, itemNumber, start, country));
                     }
                     if (directories.Count > 0)
                     {
@@ -265,10 +267,10 @@ namespace CustomDirectory.v2
                                   .Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial")
                                   .Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next")
                                   .Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix)
-                                  .Replace("<URL>" + GetUrlDirectoryByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
-                                           "<URL>" + GetUrlCustomDirectory() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>")
-                                  .Replace(("<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
-                                            "<URL>" + GetUrlDirectoryLandingByName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start")
+                                  .Replace("<URL>" + GetClusterUrlByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
+                                           "<URL>" + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>")
+                                  .Replace(("<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
+                                            "<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start")
                                   .Replace("<?xml version=\"1.0\"?>", "");
         }
 
@@ -389,18 +391,6 @@ namespace CustomDirectory.v2
         }
 
         /// <summary>
-        /// Gets the directory URL by the country name
-        /// </summary>
-        /// <param name="country">Name of the country</param>
-        /// <returns>string</returns>
-        private string GetDirectoryUrlByCountry(string countryName)
-        {
-            var clusterName = GetCountryByName(countryName).Cluster;
-            var url = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
-            return string.Format(url, GetIpAdressFromClusterName(clusterName));
-        }
-
-        /// <summary>
         /// Gets a List of entries ordered alphabetically and with cpuntry prefix country added from a list of directories
         /// </summary>
         /// <param name="directories">List<IPPhoneDirectory></param>
@@ -506,8 +496,8 @@ namespace CustomDirectory.v2
             xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
             xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
             if (showNext)
-                xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), GetUrlCustomDirectory() + BuildQueryStringSearch(first, last, number, "", (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page="), 4);
-            xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlDirectoryLanding(), 5);
+                xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), GetUrlLocalHost() + BuildQueryStringSearch(first, last, number, "", (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page="), 4);
+            xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 5);
             xmlOutput += "</CiscoIPPhoneDirectory>";
 
             return xmlOutput;
@@ -517,44 +507,17 @@ namespace CustomDirectory.v2
         /// Gets the Url Custom directory from the WebConfig
         /// </summary>
         /// <returns></returns>
-        private string GetUrlCustomDirectory()
+        private string GetUrlLocalHost()
         {
             return ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
         }
-
-        /// <summary>
-        /// Gets the Url directory from the WebConfig by the country name
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <returns></returns>
-        private string GetUrlDirectoryByCountryName(string countryName)
-        {
-            var clusterName = GetCountryByName(countryName).Cluster;
-            var cluster = GetClusterByName(clusterName);
-            var format = System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
-            return string.Format(format, cluster.IPAdress);
-
-        }
-
-        /// <summary>
-        /// Gets the Url directory landing from the WebConfig by the country name
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <returns></returns>
-        private string GetUrlDirectoryLandingByName(string countryName)
-        {
-            var clusterName = GetCountryByName(countryName).Cluster;
-            var cluster = GetClusterByName(clusterName);
-            var format = System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing.Format");
-            return string.Format(format, cluster.IPAdress);
-        }
-
+       
         /// <summary>
         /// Gets the Url directory landing from the WebConfig
         /// </summary>
         /// <param name="countryName"></param>
         /// <returns></returns>
-        private string GetUrlDirectoryLanding()
+        private string GetUrlLocalHostLanding()
         {
             return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing");
         }
@@ -645,7 +608,7 @@ namespace CustomDirectory.v2
         /// <param name="number"></param>
         /// <param name="start"></param>
         /// <returns>List<IPPhoneDirectory></returns>
-        private List<IPPhoneDirectory> GetAllDirectoriesForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string start, Country country)
+        private List<IPPhoneDirectory> GetAllDirectoriesForCountriesWithSameClusterAndWithPrefixes(string first, string last, string number, string start, Country country)
         {
             var list = new List<IPPhoneDirectory>();
             var IpPhoneDirectory = new IPPhoneDirectory();
@@ -678,7 +641,7 @@ namespace CustomDirectory.v2
         /// <param name="country"></param>
         /// <param name="start"></param>
         /// <returns>List<IPPhoneDirectoryEntry></returns>
-        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string country, string start)
+        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string countryName, string start)
         {
             var list = new List<IPPhoneDirectoryEntry>();
 
@@ -703,7 +666,7 @@ namespace CustomDirectory.v2
                 var directoryPage = string.Empty;
                 try
                 {
-                    directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, country, start);
+                    directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, countryName, start);
                 }
                 catch (Exception ex)
                 {
@@ -736,6 +699,23 @@ namespace CustomDirectory.v2
                 interruptionLoopTooLong++;
             }
             return list;
+        }
+
+
+        //Countries
+        private List<Country> GetAvailableCountries()
+        {
+            using (StreamReader r = new StreamReader(Server.MapPath("~/Resources/Countries.Metadata/" + GetCountriesFileName())))
+            {
+                string json = r.ReadToEnd();
+                List<Country> items = JsonConvert.DeserializeObject<List<Country>>(json);
+                return items;
+            }
+        }
+
+        private string GetCountriesFileName()
+        {
+            return ConfigurationManager.AppSettings.Get("Countries.FileName");
         }
 
         private List<string> GetCountryCodesWithDedicatedCluster()
@@ -814,26 +794,9 @@ namespace CustomDirectory.v2
             return listCountry;
         }
 
-        private List<Country> GetAvailableCountries()
-        {
-            using (StreamReader r = new StreamReader(Server.MapPath("~/Resources/Countries.Metadata/" + GetCountriesFileName())))
-            {
-                string json = r.ReadToEnd();
-                List<Country> items = JsonConvert.DeserializeObject<List<Country>>(json);
-                return items;
-            }
-        }
 
-        private string GetCountriesFileName()
-        {
-            return ConfigurationManager.AppSettings.Get("Countries.FileName");
-        }
 
-        private string GetClustersFileName()
-        {
-            return ConfigurationManager.AppSettings.Get("Clusters.FileName");
-        }
-
+        //Clusters
         private string GetIpAdressFromClusterName(string clusterName)
         {
             var cluster = GetClusterByName(clusterName);
@@ -860,5 +823,36 @@ namespace CustomDirectory.v2
             }
             return null;
         }
+
+        private string GetClustersFileName()
+        {
+            return ConfigurationManager.AppSettings.Get("Clusters.FileName");
+        }
+        
+        /// <summary>
+        /// Gets the Url directory landing from the WebConfig by the country name
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <returns></returns>
+        private string GetClusterLandingUrlByCountryName(string countryName)
+        {
+            var clusterName = GetCountryByName(countryName).Cluster;
+            var cluster = GetClusterByName(clusterName);
+            var format = System.Configuration.ConfigurationManager.AppSettings.Get("UrlDirectory.Landing.Format");
+            return string.Format(format, cluster.IPAdress);
+        }
+
+        /// <summary>
+        /// Gets the directory URL by the country name
+        /// </summary>
+        /// <param name="country">Name of the country</param>
+        /// <returns>string</returns>
+        private string GetClusterUrlByCountryName(string countryName)
+        {
+            var clusterName = GetCountryByName(countryName).Cluster;
+            var urlFormat = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
+            return string.Format(urlFormat, GetIpAdressFromClusterName(clusterName));
+        } 
+
     }
 }
