@@ -24,9 +24,9 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = Request.QueryString["f"];
+            var first = "alexis";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "ar";// Request.QueryString["p"];
+            var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -257,21 +257,22 @@ namespace CustomDirectory.v2
         private string FixFormatForSingleCountry(string stringDirectory, Country country, string first, string last, string number, string start)
         {
             var language = GetLanguageApplication();
-            return stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ")
-                                  .Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"))
-                                  .Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ")
-                                  .Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ")
-                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial")
-                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search")
-                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit")
-                                  .Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial")
-                                  .Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next")
-                                  .Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix)
-                                  .Replace("<URL>" + GetClusterUrlByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
-                                           "<URL>" + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>")
-                                  .Replace(("<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
-                                            "<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start")
-                                  .Replace("<?xml version=\"1.0\"?>", "");
+            stringDirectory = stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ");
+            stringDirectory = stringDirectory.Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"));
+            stringDirectory = stringDirectory.Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ");
+            stringDirectory = stringDirectory.Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ");
+            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial");
+            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search");
+            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit");
+            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial");
+            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next");
+            stringDirectory = stringDirectory.Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix);
+            stringDirectory = stringDirectory.Replace("<URL>" + GetClusterUrlByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
+                                                      "<URL>" + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>");
+            stringDirectory = stringDirectory.Replace(("<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
+                                                       "<URL>" + GetUrlLocalHostLanding() + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start");
+            stringDirectory = stringDirectory.Replace("<?xml version=\"1.0\"?>", "");
+            return stringDirectory;
         }
 
         /// <summary>
@@ -369,11 +370,11 @@ namespace CustomDirectory.v2
             foreach (var itemCluster in clusters)
             {
                 var IpPhoneDirectory = new IPPhoneDirectory();
-                IpPhoneDirectory.Country = null;// itemCountry;
+                IpPhoneDirectory.Cluster = null;
                 List<IPPhoneDirectoryEntry> listEntries = null;
                 try
                 {
-                    listEntries = GetDirectoryEntriesList(first, last, number, ""/*itemCountry.Name*/, start);
+                    listEntries = GetDirectoryEntriesList(first, last, number, GetClusterUrlByClusterName(itemCluster.Name), start);
                 }
                 catch (Exception ex)
                 {
@@ -384,6 +385,7 @@ namespace CustomDirectory.v2
                 {
                     IpPhoneDirectory.DirectoryEntries = listEntries;
                     IpPhoneDirectory.EntriesCount = listEntries.Count;
+                    IpPhoneDirectory.Cluster = itemCluster;
                     list.Add(IpPhoneDirectory);
                 }
             }
@@ -397,19 +399,20 @@ namespace CustomDirectory.v2
         /// <returns>List<IPPhoneDirectoryEntry></returns>
         private List<IPPhoneDirectoryEntry> GetEntriesOrderedAndWithPrefix(List<IPPhoneDirectory> directories)
         {
-            var listOrderedWithPrefixes = new List<IPPhoneDirectoryEntry>();
-            foreach (var dir in directories)
-            {
-                foreach (var entryItem in dir.DirectoryEntries)
-                {
-                    var entry = new IPPhoneDirectoryEntry();
-                    entry.Name = "[" + dir.Country.Code + "] " + entryItem.Name;
-                    entry.Telephone = dir.Country.ExternalPrefix + entryItem.Telephone;
-                    listOrderedWithPrefixes.Add(entry);
-                }
-            }
-            //ordernar lista
-            return listOrderedWithPrefixes;
+            //var listOrderedWithPrefixes = new List<IPPhoneDirectoryEntry>();
+            //foreach (var dir in directories)
+            //{
+            //    foreach (var entryItem in dir.DirectoryEntries)
+            //    {
+            //        var entry = new IPPhoneDirectoryEntry();
+            //        entry.Name = "[" + dir.Country.Code + "] " + entryItem.Name;
+            //        entry.Telephone = dir.Country.ExternalPrefix + entryItem.Telephone;
+            //        listOrderedWithPrefixes.Add(entry);
+            //    }
+            //}
+            ////ordernar lista
+            //return listOrderedWithPrefixes;
+            return null;
         }
 
         /// <summary>
@@ -511,7 +514,7 @@ namespace CustomDirectory.v2
         {
             return ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
         }
-       
+
         /// <summary>
         /// Gets the Url directory landing from the WebConfig
         /// </summary>
@@ -612,7 +615,9 @@ namespace CustomDirectory.v2
         {
             var list = new List<IPPhoneDirectory>();
             var IpPhoneDirectory = new IPPhoneDirectory();
-            IpPhoneDirectory.Country = country;
+            var clusterName = GetClusterUrlByClusterName(country.Name);
+            var cluster = GetClusterByName(clusterName);
+            IpPhoneDirectory.Cluster = cluster;
             List<IPPhoneDirectoryEntry> listEntries = null;
             try
             {
@@ -828,7 +833,7 @@ namespace CustomDirectory.v2
         {
             return ConfigurationManager.AppSettings.Get("Clusters.FileName");
         }
-        
+
         /// <summary>
         /// Gets the Url directory landing from the WebConfig by the country name
         /// </summary>
@@ -852,7 +857,18 @@ namespace CustomDirectory.v2
             var clusterName = GetCountryByName(countryName).Cluster;
             var urlFormat = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
             return string.Format(urlFormat, GetIpAdressFromClusterName(clusterName));
-        } 
+        }
+
+        /// <summary>
+        /// Gets the directory URL by the country name
+        /// </summary>
+        /// <param name="country">Name of the country</param>
+        /// <returns>string</returns>
+        private string GetClusterUrlByClusterName(string clusterName)
+        {
+            var urlFormat = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
+            return string.Format(urlFormat, GetIpAdressFromClusterName(clusterName));
+        }
 
     }
 }

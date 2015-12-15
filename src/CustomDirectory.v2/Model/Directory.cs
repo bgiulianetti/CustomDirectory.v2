@@ -7,7 +7,7 @@ namespace CustomDirectory.v2.Model
 {
     public class IPPhoneDirectory
     {
-        public Country Country { get; set; }
+        public Cluster Cluster { get; set; }
         public int EntriesCount { get; set; }
         public List<IPPhoneDirectoryEntry> DirectoryEntries { get; set; }
     }
