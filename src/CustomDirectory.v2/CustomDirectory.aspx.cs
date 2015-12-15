@@ -399,20 +399,19 @@ namespace CustomDirectory.v2
         /// <returns>List<IPPhoneDirectoryEntry></returns>
         private List<IPPhoneDirectoryEntry> GetEntriesOrderedAndWithPrefix(List<IPPhoneDirectory> directories)
         {
-            //var listOrderedWithPrefixes = new List<IPPhoneDirectoryEntry>();
-            //foreach (var dir in directories)
-            //{
-            //    foreach (var entryItem in dir.DirectoryEntries)
-            //    {
-            //        var entry = new IPPhoneDirectoryEntry();
-            //        entry.Name = "[" + dir.Country.Code + "] " + entryItem.Name;
-            //        entry.Telephone = dir.Country.ExternalPrefix + entryItem.Telephone;
-            //        listOrderedWithPrefixes.Add(entry);
-            //    }
-            //}
-            ////ordernar lista
-            //return listOrderedWithPrefixes;
-            return null;
+            var listOrderedWithPrefixes = new List<IPPhoneDirectoryEntry>();
+            foreach (var directory in directories)
+            {
+                foreach (var entryItem in directory.DirectoryEntries)
+                {
+                    var country = GetCountryFromDirectoryEntryAndDirectoryClusterName(entryItem, directory.Cluster.Name);
+                    var entry = new IPPhoneDirectoryEntry();
+                    entry.Name = "[" + country.Code + "] " + entryItem.Name;
+                    entry.Telephone = country.ExternalPrefix + entryItem.Telephone;
+                    listOrderedWithPrefixes.Add(entry);
+                }
+            }
+            return listOrderedWithPrefixes;
         }
 
         /// <summary>
@@ -504,25 +503,6 @@ namespace CustomDirectory.v2
             xmlOutput += "</CiscoIPPhoneDirectory>";
 
             return xmlOutput;
-        }
-
-        /// <summary>
-        /// Gets the Url Custom directory from the WebConfig
-        /// </summary>
-        /// <returns></returns>
-        private string GetUrlLocalHost()
-        {
-            return ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
-        }
-
-        /// <summary>
-        /// Gets the Url directory landing from the WebConfig
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <returns></returns>
-        private string GetUrlLocalHostLanding()
-        {
-            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing");
         }
 
         /// <summary>
@@ -707,6 +687,8 @@ namespace CustomDirectory.v2
         }
 
 
+
+
         //Countries
         private List<Country> GetAvailableCountries()
         {
@@ -801,6 +783,8 @@ namespace CustomDirectory.v2
 
 
 
+
+
         //Clusters
         private string GetIpAdressFromClusterName(string clusterName)
         {
@@ -868,6 +852,49 @@ namespace CustomDirectory.v2
         {
             var urlFormat = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
             return string.Format(urlFormat, GetIpAdressFromClusterName(clusterName));
+        }
+
+
+
+        //LocalHost
+
+        /// <summary>
+        /// Gets the Url Custom directory from the WebConfig
+        /// </summary>
+        /// <returns></returns>
+        private string GetUrlLocalHost()
+        {
+            return ConfigurationManager.AppSettings.Get("UrlCustomDirectory");
+        }
+
+        /// <summary>
+        /// Gets the Url directory landing from the WebConfig
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <returns></returns>
+        private string GetUrlLocalHostLanding()
+        {
+            return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing");
+        }
+
+
+        private Country GetCountryFromDirectoryEntryAndDirectoryClusterName(IPPhoneDirectoryEntry entry, string clusterName)
+        {
+            var countries = GetAvailableCountries();
+            foreach (var country in countries)
+            {
+                if(country.Cluster == clusterName)
+                {
+                    foreach (var prefix in country.InternalPrefix)
+                    {
+                        if(entry.Telephone.StartsWith(prefix) && entry.Telephone.Length.ToString() == country.NumberLength)
+                        {
+                            return country;
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
     }
