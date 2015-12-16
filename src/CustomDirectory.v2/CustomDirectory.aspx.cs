@@ -781,7 +781,17 @@ namespace CustomDirectory.v2
             return listCountry;
         }
 
-
+        private List<Country> GetCountriesFromCluster(string clusterName)
+        {
+            var countriesList = new List<Country>();
+            var countries = GetAvailableCountries();
+            foreach (var country in countries)
+            {
+                if (country.Cluster == clusterName)
+                    countriesList.Add(country);
+            }
+            return countriesList;
+        }
 
 
 
@@ -880,17 +890,14 @@ namespace CustomDirectory.v2
 
         private Country GetCountryFromDirectoryEntryAndDirectoryClusterName(IPPhoneDirectoryEntry entry, string clusterName)
         {
-            var countries = GetAvailableCountries();
+            var countries = GetCountriesFromCluster(clusterName);
             foreach (var country in countries)
             {
-                if(country.Cluster == clusterName)
+                foreach (var prefix in country.InternalPrefix)
                 {
-                    foreach (var prefix in country.InternalPrefix)
+                    if (entry.Telephone.StartsWith(prefix) && entry.Telephone.Length.ToString() == country.NumberLength)
                     {
-                        if(entry.Telephone.StartsWith(prefix) && entry.Telephone.Length.ToString() == country.NumberLength)
-                        {
-                            return country;
-                        }
+                        return country;
                     }
                 }
             }
