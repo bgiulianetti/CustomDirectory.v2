@@ -26,7 +26,7 @@ namespace CustomDirectory.v2
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = "uy";// Request.QueryString["p"];
+            var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -91,7 +91,13 @@ namespace CustomDirectory.v2
                     if (directories.Count > 0)
                     {
                         var allEntries = GetEntriesOrderedAndWithPrefix(directories);
-                        var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
+                        var entriesOfTheCountry = new List<IPPhoneDirectoryEntry>();
+                        foreach (var entry in allEntries)
+                        {
+                            if (entry.Name.StartsWith("[" + country.Code.ToUpper() + "]"))
+                                entriesOfTheCountry.Add(entry);
+                        }
+                        var selectedEntries = SelectEntriesByPage(entriesOfTheCountry, Int32.Parse(page));
                         xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
@@ -495,7 +501,7 @@ namespace CustomDirectory.v2
             xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
             xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
             if (showNext)
-                xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), GetUrlLocalHost() + BuildQueryStringSearch(first, last, number, "", (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page="), 4);
+                xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, "", "COUNTRY",(intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page="), 4);
             xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 5);
             xmlOutput += "</CiscoIPPhoneDirectory>";
 
