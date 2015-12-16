@@ -24,9 +24,9 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = "alexis";// Request.QueryString["f"];
+            var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
-            var countryCode = Request.QueryString["p"];
+            var countryCode = "uy";// Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
@@ -83,7 +83,6 @@ namespace CustomDirectory.v2
                 try
                 {
                     var country = GetCountryByCode(countryCode);
-                    //var cluster = GetClusterByName(country.Cluster);
                     var url = GetClusterUrlByCountryName(country.Name);
                     foreach (var itemNumber in country.InternalPrefix)
                     {
@@ -118,8 +117,6 @@ namespace CustomDirectory.v2
             //Todos los paises de todos los clusters
             else if (countryCode == string.Empty)
             {
-
-                //refactor de busqueda por cluster
                 List<IPPhoneDirectory> directories = null;
                 try
                 {
@@ -158,16 +155,16 @@ namespace CustomDirectory.v2
         /// <param name="country">Country name</param>
         /// <param name="start">The number of records to skip</param>
         /// <returns></returns>
-        private string GetStringSinglePageDirectory(HttpClient client, string first, string last, string number, string directoryUrl, string start)
+        private string GetStringSinglePageDirectory(HttpClient client, string first, string last, string number, string clusterUrl, string start)
         {
-            client.BaseAddress = new Uri(directoryUrl);
+            client.BaseAddress = new Uri(clusterUrl);
             HttpResponseMessage response = null;
             var intStart = Int32.Parse(start);
 
             for (int i = 1; i <= intStart; i += 31)
             {
-                var request = GenerateHttpRequestMassage(directoryUrl);
-                request.RequestUri = new Uri(directoryUrl + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + i.ToString());
+                var request = GenerateHttpRequestMassage(clusterUrl);
+                request.RequestUri = new Uri(clusterUrl + "?l=" + last + "&f=" + first + "&n=" + number + "&start=" + i.ToString());
                 try
                 {
                     response = client.SendAsync(request).Result;
@@ -406,7 +403,7 @@ namespace CustomDirectory.v2
                 {
                     var country = GetCountryFromDirectoryEntryAndDirectoryClusterName(entryItem, directory.Cluster.Name);
                     var entry = new IPPhoneDirectoryEntry();
-                    entry.Name = "[" + country.Code + "] " + entryItem.Name;
+                    entry.Name = "[" + country.Code.ToUpper() + "] " + entryItem.Name;
                     entry.Telephone = country.ExternalPrefix + entryItem.Telephone;
                     listOrderedWithPrefixes.Add(entry);
                 }
@@ -595,13 +592,12 @@ namespace CustomDirectory.v2
         {
             var list = new List<IPPhoneDirectory>();
             var IpPhoneDirectory = new IPPhoneDirectory();
-            var clusterName = GetClusterUrlByClusterName(country.Name);
-            var cluster = GetClusterByName(clusterName);
-            IpPhoneDirectory.Cluster = cluster;
+            var clusterUrl = GetClusterUrlByClusterName(country.Cluster);
+            IpPhoneDirectory.Cluster = GetClusterByName(country.Cluster);
             List<IPPhoneDirectoryEntry> listEntries = null;
             try
             {
-                listEntries = GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(first, last, number, country.Name, start);
+                listEntries = GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(first, last, number, clusterUrl, start);
             }
             catch (Exception ex)
             {
@@ -626,7 +622,7 @@ namespace CustomDirectory.v2
         /// <param name="country"></param>
         /// <param name="start"></param>
         /// <returns>List<IPPhoneDirectoryEntry></returns>
-        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string countryName, string start)
+        private List<IPPhoneDirectoryEntry> GetDirectoryEntriesListForCountriesWithSharedClusterAndPrefixes(string first, string last, string number, string clusterUrl, string start)
         {
             var list = new List<IPPhoneDirectoryEntry>();
 
@@ -651,7 +647,7 @@ namespace CustomDirectory.v2
                 var directoryPage = string.Empty;
                 try
                 {
-                    directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, countryName, start);
+                    directoryPage = GetStringSinglePageDirectory(new HttpClient(), first, last, number, clusterUrl, start);
                 }
                 catch (Exception ex)
                 {
@@ -793,6 +789,42 @@ namespace CustomDirectory.v2
             return countriesList;
         }
 
+        private Country GetCountryWithoutPrefixFromClusterName(string clusterName)
+        {
+            var countries = GetCountriesFromCluster(clusterName);
+            foreach (var country in countries)
+            {
+                if (country.InternalPrefix.Count == 0)
+                    return country;
+            }
+            return null;
+        }
+
+        private Country GetCountryFromDirectoryEntryAndDirectoryClusterName(IPPhoneDirectoryEntry entry, string clusterName)
+        {
+            var countries = GetCountriesFromCluster(clusterName);
+            Country countryReponse = null;
+            foreach (var country in countries)
+            {
+                foreach (var prefix in country.InternalPrefix)
+                {
+                    var numberLengthWithPrefix = prefix.Length + Int32.Parse(country.NumberLength);
+                    if (entry.Telephone.StartsWith(prefix) && entry.Telephone.Length == numberLengthWithPrefix)
+                    {
+                        countryReponse = country;
+                        break;
+                    }
+                }
+                if (countryReponse != null)
+                    break;
+            }
+            if (countryReponse == null)
+                return GetCountryWithoutPrefixFromClusterName(clusterName);
+            else
+                return countryReponse;
+        }
+
+
 
 
         //Clusters
@@ -885,23 +917,6 @@ namespace CustomDirectory.v2
         private string GetUrlLocalHostLanding()
         {
             return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing");
-        }
-
-
-        private Country GetCountryFromDirectoryEntryAndDirectoryClusterName(IPPhoneDirectoryEntry entry, string clusterName)
-        {
-            var countries = GetCountriesFromCluster(clusterName);
-            foreach (var country in countries)
-            {
-                foreach (var prefix in country.InternalPrefix)
-                {
-                    if (entry.Telephone.StartsWith(prefix) && entry.Telephone.Length.ToString() == country.NumberLength)
-                    {
-                        return country;
-                    }
-                }
-            }
-            return null;
         }
 
     }
