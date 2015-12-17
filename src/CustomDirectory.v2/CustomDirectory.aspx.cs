@@ -98,7 +98,7 @@ namespace CustomDirectory.v2
                                 entriesOfTheCountry.Add(entry);
                         }
                         var selectedEntries = SelectEntriesByPage(entriesOfTheCountry, Int32.Parse(page));
-                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
+                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, entriesOfTheCountry.Count, country.Code);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
                     else
@@ -131,7 +131,7 @@ namespace CustomDirectory.v2
                     {
                         var allEntries = GetEntriesOrderedAndWithPrefix(directories);
                         var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
-                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count);
+                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count, string.Empty);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
                     else
@@ -462,7 +462,7 @@ namespace CustomDirectory.v2
         /// <param name="page"></param>
         /// <param name="totalEntries"></param>
         /// <returns></returns>
-        private string BuildXML(List<IPPhoneDirectoryEntry> entries, string first, string last, string number, string page, int totalEntries)
+        private string BuildXML(List<IPPhoneDirectoryEntry> entries, string first, string last, string number, string page, int totalEntries, string countryCode)
         {
             var language = GetLanguageApplication();
             var xmlOutput = "<CiscoIPPhoneDirectory>" + Environment.NewLine;
@@ -501,7 +501,18 @@ namespace CustomDirectory.v2
             xmlOutput += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
             xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
             if (showNext)
-                xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, "", "COUNTRY",(intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page="), 4);
+            {
+                if (countryCode != string.Empty)
+                {
+                    var urlReplacedAmpersand = GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, "", countryCode, (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page=").Replace("&p", "&amp;p");
+                    xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), urlReplacedAmpersand, 4);
+                }
+                else
+                {
+                    var urlReplacedAmpersand = GetUrlLocalHost() + BuildQueryStringSearch(first, last, number, "", (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page=");
+                    xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), urlReplacedAmpersand, 4);
+                }
+            }
             xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 5);
             xmlOutput += "</CiscoIPPhoneDirectory>";
 
