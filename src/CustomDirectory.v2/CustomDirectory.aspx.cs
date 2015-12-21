@@ -24,7 +24,7 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = Request.QueryString["f"];
+            var first = "alexis";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -121,7 +121,7 @@ namespace CustomDirectory.v2
                 //los resultantes van a ser los que tengo que utilizar
             }
             //Todos los paises de todos los clusters
-            else if (countryCode == string.Empty)
+            else if (countryCode == string.Empty || countryCode == "cl")
             {
                 List<IPPhoneDirectory> directories = null;
                 try
@@ -129,7 +129,22 @@ namespace CustomDirectory.v2
                     directories = GetAllDirectories(first, last, number, start);
                     if (directories.Count > 0)
                     {
-                        var allEntries = GetEntriesOrderedAndWithPrefix(directories);
+                        var _allEntries = GetEntriesOrderedAndWithPrefix(directories);
+                        
+                        
+                        var allEntries = new List<IPPhoneDirectoryEntry>();
+                        if(countryCode == "cl")
+                        {
+                            for (int i = 0; i < _allEntries.Count; i++)
+                            {
+                                if(_allEntries[i].Name.Contains("[CL]"))
+                                    allEntries.Add(_allEntries[i]);
+                            }
+                        }
+                        else
+                        {
+                            allEntries = _allEntries;
+                        }
                         var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
                         xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count, string.Empty);
                         xmlOutput = FixAccentuation(xmlOutput);
