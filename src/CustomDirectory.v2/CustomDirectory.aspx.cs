@@ -24,7 +24,7 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = "alexis";// Request.QueryString["f"];
+            var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -114,12 +114,12 @@ namespace CustomDirectory.v2
                 }
             }
             //Paises sin prefijo con cluster compartido
-            else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
-            {
+            //else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
+            //{
                 //To Do !!
                 //corro el metodo de obtener los paises de mi mismo cluster, y con sus prefijos voy descartando los que no van, 
                 //los resultantes van a ser los que tengo que utilizar
-            }
+            //}
             //Todos los paises de todos los clusters
             else if (countryCode == string.Empty || countryCode == "cl")
             {
