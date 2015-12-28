@@ -24,7 +24,7 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = Request.QueryString["f"];
+            var first = "ale";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
@@ -114,14 +114,7 @@ namespace CustomDirectory.v2
                 }
             }
             //Paises sin prefijo con cluster compartido
-            //else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
-            //{
-                //To Do !!
-                //corro el metodo de obtener los paises de mi mismo cluster, y con sus prefijos voy descartando los que no van, 
-                //los resultantes van a ser los que tengo que utilizar
-            //}
-            //Todos los paises de todos los clusters
-            else if (countryCode == string.Empty || countryCode == "cl")
+            else if (GetCountryCodesWithSharedClusterWithOutPrefixes().Contains(countryCode))
             {
                 List<IPPhoneDirectory> directories = null;
                 try
@@ -130,14 +123,12 @@ namespace CustomDirectory.v2
                     if (directories.Count > 0)
                     {
                         var _allEntries = GetEntriesOrderedAndWithPrefix(directories);
-                        
-                        
                         var allEntries = new List<IPPhoneDirectoryEntry>();
-                        if(countryCode == "cl")
+                        if (countryCode == "cl")
                         {
                             for (int i = 0; i < _allEntries.Count; i++)
                             {
-                                if(_allEntries[i].Name.Contains("[CL]"))
+                                if (_allEntries[i].Name.Contains("[CL]"))
                                     allEntries.Add(_allEntries[i]);
                             }
                         }
@@ -145,6 +136,31 @@ namespace CustomDirectory.v2
                         {
                             allEntries = _allEntries;
                         }
+                        var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
+                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count, string.Empty);
+                        xmlOutput = FixAccentuation(xmlOutput);
+                    }
+                    else
+                    {
+                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
+                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    xmlOutput = FormatErrorMessage("Error", ex.Message);
+                }
+            }
+            //Todos los paises de todos los clusters
+            else if (countryCode == string.Empty)
+            {
+                List<IPPhoneDirectory> directories = null;
+                try
+                {
+                    directories = GetAllDirectories(first, last, number, start);
+                    if (directories.Count > 0)
+                    {
+                        var allEntries = GetEntriesOrderedAndWithPrefix(directories);
                         var selectedEntries = SelectEntriesByPage(allEntries, Int32.Parse(page));
                         xmlOutput = BuildXML(selectedEntries, first, last, number, page, allEntries.Count, string.Empty);
                         xmlOutput = FixAccentuation(xmlOutput);
@@ -422,11 +438,17 @@ namespace CustomDirectory.v2
             {
                 foreach (var entryItem in directory.DirectoryEntries)
                 {
-                    var country = GetCountryFromDirectoryEntryAndDirectoryClusterName(entryItem, directory.Cluster.Name);
-                    var entry = new IPPhoneDirectoryEntry();
-                    entry.Name = "[" + country.Code.ToUpper() + "] " + entryItem.Name;
-                    entry.Telephone = country.ExternalPrefix + entryItem.Telephone;
-                    listOrderedWithPrefixes.Add(entry);
+                    if (!string.Equals(entryItem.Telephone, string.Empty, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var country = GetCountryFromDirectoryEntryAndDirectoryClusterName(entryItem, directory.Cluster.Name);
+                        if (country != null)
+                        {
+                            var entry = new IPPhoneDirectoryEntry();
+                            entry.Name = "[" + country.Code.ToUpper() + "] " + entryItem.Name;
+                            entry.Telephone = country.ExternalPrefix + entryItem.Telephone;
+                            listOrderedWithPrefixes.Add(entry);
+                        }
+                    }
                 }
             }
             return listOrderedWithPrefixes;
