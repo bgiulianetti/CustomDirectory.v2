@@ -177,6 +177,7 @@ namespace CustomDirectory.v2
                     xmlOutput = FormatErrorMessage("Error", ex.Message);
                 }
             }
+            xmlOutput = FixAccentuation(xmlOutput);
             Response.ContentType = "text/xml";
             Response.Write(xmlOutput);
         }
@@ -584,7 +585,10 @@ namespace CustomDirectory.v2
                                   .Replace("Emisi�n", "Emisión")
                                   .Replace("Fari�a", "Fariña")
                                   .Replace("Malarg�e", "Malargüe")
-                                  .Replace("Mar�a", "María");
+                                  .Replace("Mar�a", "María")
+                                  .Replace("D�az", "Díaz")
+                                  .Replace("B�rtolo", "Bértolo")
+                                  .Replace("Mart�n", "Martín");
         }
 
         /// <summary>
