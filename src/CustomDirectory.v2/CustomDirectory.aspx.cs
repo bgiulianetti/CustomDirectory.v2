@@ -53,8 +53,9 @@ namespace CustomDirectory.v2
 
             if(!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
             {
-                xmlOutput = FormatErrorMessage("Error", "Invalid Country");
-                xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                xmlOutput = "<CiscoIPPhoneDirectory><Prompt>Invalid Country</Prompt></CiscoIPPhoneDirectory>";
+                //FormatErrorMessage("Error", "Invalid Country");
+                //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
             }
             //Paises con Cluster Dedicados
             else if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
@@ -62,9 +63,10 @@ namespace CustomDirectory.v2
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
                 {
-                    xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"),
-                                                   ConfigurationManager.AppSettings.Get(language + ".InvalidCountryCode"));
-                    xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                    //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"),
+                    //                               ConfigurationManager.AppSettings.Get(language + ".InvalidCountryCode"));
+                    //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>Invalid Country</Prompt></CiscoIPPhoneDirectory>";
                 }
                 else
                 {
@@ -78,8 +80,9 @@ namespace CustomDirectory.v2
                     }
                     catch (Exception ex)
                     {
-                        xmlOutput = FormatErrorMessage("Error", ex.Message);
-                        xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                        //xmlOutput = FormatErrorMessage("Error", ex.Message);
+                        //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                        xmlOutput = "<CiscoIPPhoneDirectory><Prompt>" + ex.Message + "</Prompt></CiscoIPPhoneDirectory>";
                     }
                 }
             }
@@ -110,16 +113,18 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
-                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
-                        xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                        //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
+                        //                               ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                        xmlOutput = "<CiscoIPPhoneDirectory><Prompt>No Matches</Prompt></CiscoIPPhoneDirectory>";
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    xmlOutput = FormatErrorMessage("Error", ex.Message);
-                    xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                    //xmlOutput = FormatErrorMessage("Error", ex.Message);
+                    //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>No Matches</Prompt></CiscoIPPhoneDirectory>";
                 }
             }
             //Paises sin prefijo con cluster compartido
@@ -151,13 +156,14 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
-                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
+                        //                               ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        xmlOutput = "<CiscoIPPhoneDirectory><Prompt>No Matches</Prompt></CiscoIPPhoneDirectory>";
                     }
                 }
                 catch (Exception ex)
                 {
-                    xmlOutput = FormatErrorMessage("Error", ex.Message);
+                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>" + ex.Message + "</Prompt></CiscoIPPhoneDirectory>";
                 }
             }
             //Todos los paises de todos los clusters
@@ -182,12 +188,12 @@ namespace CustomDirectory.v2
 
                 catch (Exception ex)
                 {
-                    xmlOutput = FormatErrorMessage("Error", ex.Message);
+                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>" + ex.Message + "</Prompt></CiscoIPPhoneDirectory>";
                 }
             }
             else
             {
-                xmlOutput = FormatErrorMessage("Error", "Invalid Country");
+                xmlOutput = "<CiscoIPPhoneDirectory><Prompt>Invalid Country</Prompt></CiscoIPPhoneDirectory>";
             }
             xmlOutput = FixAccentuation(xmlOutput);
             Response.ContentType = "text/xml";
