@@ -53,7 +53,8 @@ namespace CustomDirectory.v2
 
             if(!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
             {
-                xmlOutput = "<Text>Invalid Country Code</Text>";
+                xmlOutput = FormatErrorMessage("Error", "Invalid Country");
+                xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
             }
             //Paises con Cluster Dedicados
             else if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
@@ -63,6 +64,7 @@ namespace CustomDirectory.v2
                 {
                     xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"),
                                                    ConfigurationManager.AppSettings.Get(language + ".InvalidCountryCode"));
+                    xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
                 }
                 else
                 {
@@ -77,6 +79,7 @@ namespace CustomDirectory.v2
                     catch (Exception ex)
                     {
                         xmlOutput = FormatErrorMessage("Error", ex.Message);
+                        xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
                     }
                 }
             }
@@ -109,12 +112,14 @@ namespace CustomDirectory.v2
                     {
                         xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
                                                        ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
                     }
 
                 }
                 catch (Exception ex)
                 {
                     xmlOutput = FormatErrorMessage("Error", ex.Message);
+                    xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
                 }
             }
             //Paises sin prefijo con cluster compartido
