@@ -25,7 +25,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = Request.QueryString["l"];
+            var last = "Día";// Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
@@ -34,12 +34,12 @@ namespace CustomDirectory.v2
             if (first == null)
                 first = string.Empty;
             else
-                first.ToLower();
+                first = ReplaceAccentuation(first);
 
             if (last == null)
                 last = string.Empty;
             else
-                last.ToLower();
+                last = ReplaceAccentuation(last);
 
             if (countryCode == null)
                 countryCode = string.Empty;
@@ -51,8 +51,12 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
+            if(!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
+            {
+                xmlOutput = "<Text>Invalid Country Code</Text>";
+            }
             //Paises con Cluster Dedicados
-            if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
+            else if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
             {
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
@@ -176,6 +180,10 @@ namespace CustomDirectory.v2
                 {
                     xmlOutput = FormatErrorMessage("Error", ex.Message);
                 }
+            }
+            else
+            {
+                xmlOutput = "<Text>Invalid country</Text>";
             }
             xmlOutput = FixAccentuation(xmlOutput);
             Response.ContentType = "text/xml";
@@ -975,6 +983,12 @@ namespace CustomDirectory.v2
         private string GetUrlLocalHostLanding()
         {
             return System.Configuration.ConfigurationManager.AppSettings.Get("UrlCustomDirectory.Landing");
+        }
+
+        private string ReplaceAccentuation(string text)
+        {
+            text.ToLower();
+            return text.Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u");
         }
 
     }
