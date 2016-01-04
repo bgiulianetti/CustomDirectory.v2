@@ -171,8 +171,7 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = "<Text>No Matches</Text>";
-                        //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"), ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"), ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
                     }
                 }
 
@@ -183,7 +182,7 @@ namespace CustomDirectory.v2
             }
             else
             {
-                xmlOutput = "<Text>Invalid country</Text>";
+                xmlOutput = FormatErrorMessage("Error", "Invalid Country");
             }
             xmlOutput = FixAccentuation(xmlOutput);
             Response.ContentType = "text/xml";
@@ -642,7 +641,7 @@ namespace CustomDirectory.v2
         private string FormatErrorMessage(string title, string message)
         {
             return "<Title>" + title + "</Title>" + Environment.NewLine +
-                    "<Prompt/>" + Environment.NewLine +
+                    "<Prompt>Error<Prompt/>" + Environment.NewLine +
                     "<Text>" + message + "</Text>";
         }
 
