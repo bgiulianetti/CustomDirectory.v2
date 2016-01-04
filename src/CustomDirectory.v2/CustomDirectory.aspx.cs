@@ -25,7 +25,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = "Día";// Request.QueryString["l"];
+            var last = "bertolo";// Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
@@ -171,8 +171,8 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
-                                                       ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        xmlOutput = "<Text>No Matches</Text>";
+                        //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"), ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
                     }
                 }
 
