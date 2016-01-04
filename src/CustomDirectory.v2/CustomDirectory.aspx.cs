@@ -25,7 +25,7 @@ namespace CustomDirectory.v2
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
             var first = Request.QueryString["f"];
-            var last = "bertolo";// Request.QueryString["l"];
+            var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
