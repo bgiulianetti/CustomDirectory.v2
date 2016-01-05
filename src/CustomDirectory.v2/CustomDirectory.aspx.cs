@@ -53,9 +53,7 @@ namespace CustomDirectory.v2
 
             if(!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
             {
-                xmlOutput = "<CiscoIPPhoneDirectory><Prompt>Invalid Country</Prompt></CiscoIPPhoneDirectory>";
-                //FormatErrorMessage("Error", "Invalid Country");
-                //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
+                xmlOutput = FormatErrorMessage("Invalid Country");
             }
             //Paises con Cluster Dedicados
             else if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
@@ -63,10 +61,7 @@ namespace CustomDirectory.v2
                 var country = GetCountryByCode(countryCode);
                 if (country == null)
                 {
-                    //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"),
-                    //                               ConfigurationManager.AppSettings.Get(language + ".InvalidCountryCode"));
-                    //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
-                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>Invalid Country</Prompt></CiscoIPPhoneDirectory>";
+                    xmlOutput = FormatErrorMessage("Invalid Country");
                 }
                 else
                 {
@@ -80,9 +75,7 @@ namespace CustomDirectory.v2
                     }
                     catch (Exception ex)
                     {
-                        //xmlOutput = FormatErrorMessage("Error", ex.Message);
-                        //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
-                        xmlOutput = "<CiscoIPPhoneDirectory><Prompt>" + ex.Message + "</Prompt></CiscoIPPhoneDirectory>";
+                        xmlOutput = FormatErrorMessage(ex.Message);
                     }
                 }
             }
@@ -113,18 +106,13 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
-                        //                               ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
-                        //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
-                        xmlOutput = "<CiscoIPPhoneDirectory><Prompt>No Matches</Prompt></CiscoIPPhoneDirectory>";
+                        xmlOutput = FormatErrorMessage("No Matches");
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    //xmlOutput = FormatErrorMessage("Error", ex.Message);
-                    //xmlOutput = "<CiscoIPPhoneText>" + Environment.NewLine + xmlOutput + Environment.NewLine + "</CiscoIPPhoneText>";
-                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>No Matches</Prompt></CiscoIPPhoneDirectory>";
+                    xmlOutput = FormatErrorMessage(ex.Message);
                 }
             }
             //Paises sin prefijo con cluster compartido
@@ -156,14 +144,12 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        //xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"),
-                        //                               ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
-                        xmlOutput = "<CiscoIPPhoneDirectory><Prompt>No Matches</Prompt></CiscoIPPhoneDirectory>";
+                        xmlOutput = FormatErrorMessage("No Matches");
                     }
                 }
                 catch (Exception ex)
                 {
-                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>" + ex.Message + "</Prompt></CiscoIPPhoneDirectory>";
+                    xmlOutput = FormatErrorMessage(ex.Message);
                 }
             }
             //Todos los paises de todos los clusters
@@ -182,19 +168,16 @@ namespace CustomDirectory.v2
                     }
                     else
                     {
-                        xmlOutput = FormatErrorMessage(ConfigurationManager.AppSettings.Get(language + ".Error"), ConfigurationManager.AppSettings.Get(language + ".ErrorNoMatches"));
+                        xmlOutput = FormatErrorMessage("No Matches");
                     }
                 }
 
                 catch (Exception ex)
                 {
-                    xmlOutput = "<CiscoIPPhoneDirectory><Prompt>" + ex.Message + "</Prompt></CiscoIPPhoneDirectory>";
+                    xmlOutput = FormatErrorMessage(ex.Message);
                 }
             }
-            else
-            {
-                xmlOutput = "<CiscoIPPhoneDirectory><Prompt>Invalid Country</Prompt></CiscoIPPhoneDirectory>";
-            }
+
             xmlOutput = FixAccentuation(xmlOutput);
             Response.ContentType = "text/xml";
             Response.Write(xmlOutput);
@@ -233,33 +216,6 @@ namespace CustomDirectory.v2
                     throw new Exception(response.ReasonPhrase + " " + ConfigurationManager.AppSettings.Get(GetLanguageApplication() + ".GettingCountry"));
             }
             return response.Content.ReadAsStringAsync().Result;
-        }
-
-        /// <summary>
-        /// Gets the name of a country by it´s code
-        /// </summary>
-        /// <param name="countryCode"></param>
-        /// <returns></returns>
-        private Country GetCountryByCode(string countryCode)
-        {
-            var countries = GetAvailableCountries();
-            foreach (var countryItem in countries)
-            {
-                if (string.Equals(countryCode, countryItem.Code, StringComparison.InvariantCultureIgnoreCase))
-                    return countryItem;
-            }
-            return null;
-        }
-
-        private Country GetCountryByName(string countryName)
-        {
-            var countries = GetAvailableCountries();
-            foreach (var countryItem in countries)
-            {
-                if (string.Equals(countryName, countryItem.Name, StringComparison.InvariantCultureIgnoreCase))
-                    return countryItem;
-            }
-            return null;
         }
 
         /// <summary>
@@ -649,11 +605,9 @@ namespace CustomDirectory.v2
         /// <param name="title"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private string FormatErrorMessage(string title, string message)
+        private string FormatErrorMessage(string message)
         {
-            return "<Title>" + title + "</Title>" + Environment.NewLine +
-                    "<Prompt>Error<Prompt/>" + Environment.NewLine +
-                    "<Text>" + message + "</Text>";
+            return "<CiscoIPPhoneDirectory><Prompt>" + message + "</Prompt></CiscoIPPhoneDirectory>";
         }
 
         /// <summary>
@@ -900,6 +854,34 @@ namespace CustomDirectory.v2
                 return countryReponse;
         }
 
+        /// <summary>
+        /// Gets the name of a country by it´s code
+        /// </summary>
+        /// <param name="countryCode"></param>
+        /// <returns></returns>
+        private Country GetCountryByCode(string countryCode)
+        {
+            var countries = GetAvailableCountries();
+            foreach (var countryItem in countries)
+            {
+                if (string.Equals(countryCode, countryItem.Code, StringComparison.InvariantCultureIgnoreCase))
+                    return countryItem;
+            }
+            return null;
+        }
+
+        private Country GetCountryByName(string countryName)
+        {
+            var countries = GetAvailableCountries();
+            foreach (var countryItem in countries)
+            {
+                if (string.Equals(countryName, countryItem.Name, StringComparison.InvariantCultureIgnoreCase))
+                    return countryItem;
+            }
+            return null;
+        }
+
+
 
 
 
@@ -971,6 +953,7 @@ namespace CustomDirectory.v2
             var urlFormat = ConfigurationManager.AppSettings.Get("UrlDirectory.Format");
             return string.Format(urlFormat, GetIpAdressFromClusterName(clusterName));
         }
+
 
 
 
