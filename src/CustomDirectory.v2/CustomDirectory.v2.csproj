@@ -112,6 +112,7 @@
     <None Include="Properties\PublishProfiles\pub.pubxml" />
     <Content Include="Resources\Countries.Metadata\Countries.ConoSur.json" />
     <Content Include="Resources\Clusters.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.Argentina.json" />
     <None Include="Web.AR.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

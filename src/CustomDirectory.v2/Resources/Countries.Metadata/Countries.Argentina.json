@@ -1,9 +1,9 @@
-[
+﻿[
     {
         "Name": "Argentina",
         "Code": "ar",
         "InternalPrefix": [],
-        "ExternalPrefix": "*188",
+        "ExternalPrefix": "",
         "NumberLength": "",
         "Cluster": "Argentina"
     },
@@ -11,7 +11,7 @@
         "Name": "Chile",
         "Code": "cl",
         "internalPrefix": [],
-        "ExternalPrefix": "",
+        "ExternalPrefix": "*18",
         "NumberLength": "",
         "Cluster": "ConoSur"
     },
@@ -88,7 +88,7 @@
         "Cluster": "ConoSur"
     },
     {
-        "Name": "Espa�a",
+        "Name": "España",
         "Code": "es",
         "InternalPrefix": ["634", "635", "636", "637"],
         "ExternalPrefix": "*18",
