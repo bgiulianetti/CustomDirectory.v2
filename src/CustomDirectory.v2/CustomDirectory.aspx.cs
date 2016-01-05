@@ -24,24 +24,24 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = Request.QueryString["f"];
+            var first = "  ";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
             var countryCode = Request.QueryString["p"];
             var number = Request.QueryString["n"];
             var start = Request.QueryString["start"];
             var page = Request.QueryString["page"];
 
-            if (first == null)
+            if (first == null || first.Replace(" ", "") == string.Empty)
                 first = string.Empty;
             else
                 first = ReplaceAccentuation(first);
 
-            if (last == null)
+            if (last == null || last.Replace(" ", "") == string.Empty)
                 last = string.Empty;
             else
                 last = ReplaceAccentuation(last);
 
-            if (countryCode == null)
+            if (countryCode == null || countryCode.Replace(" ", "") == string.Empty)
                 countryCode = string.Empty;
             else
                 countryCode.ToLower();
