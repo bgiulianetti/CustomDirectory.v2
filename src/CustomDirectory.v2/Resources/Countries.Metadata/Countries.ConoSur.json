@@ -27,7 +27,7 @@
         "Name": "Brasil",
         "Code": "br",
         "InternalPrefix": ["41"],
-        "ExternalPrefix": "*188",
+        "ExternalPrefix": "*18",
         "NumberLength": "6",
         "Cluster": "Brasil"
     },

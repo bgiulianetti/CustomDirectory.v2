@@ -265,23 +265,107 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string FixFormatForSingleCountry(string stringDirectory, Country country, string first, string last, string number, string start)
         {
+            //////////////////////////////////
+
+            var hasDial = false;
+            var hasEditDial = false;
+            var hasExit = false;
+            var hasNext = false;
+            var hasSearch = false;
+            var entriesList = new List<IPPhoneDirectoryEntry>();
             var language = GetLanguageApplication();
-            stringDirectory = stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ");
-            stringDirectory = stringDirectory.Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"));
-            stringDirectory = stringDirectory.Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ");
-            stringDirectory = stringDirectory.Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ");
-            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial");
-            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search");
-            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit");
-            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial");
-            stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next");
-            stringDirectory = stringDirectory.Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix);
-            stringDirectory = stringDirectory.Replace("<URL>" + GetClusterUrlByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
-                                                      "<URL>" + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>");
-            stringDirectory = stringDirectory.Replace(("<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
-                                                       "<URL>" + GetUrlLocalHostLanding() + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start");
-            stringDirectory = stringDirectory.Replace("<?xml version=\"1.0\"?>", "");
-            return stringDirectory;
+            var prompt = string.Empty;
+
+
+            if (stringDirectory.Contains("<Name>Dial</Name>"))
+                hasDial = true;
+            if (stringDirectory.Contains("<Name>EditDial</Name>"))
+                hasEditDial = true;
+            if (stringDirectory.Contains("<Name>Exit</Name>"))
+                hasExit = true;
+            if (stringDirectory.Contains("<Name>Next</Name>"))
+                hasNext = true;
+            if (stringDirectory.Contains("<Name>Search</Name>"))
+                hasSearch = true;
+
+            var promptLocation = stringDirectory.IndexOf("<Prompt>", 0) + 8;
+            var stringPrompt = string.Empty;
+            while (stringDirectory[promptLocation] != '<')
+            {
+                stringPrompt += stringDirectory[promptLocation].ToString();
+                promptLocation++;
+            }
+
+            stringDirectory = DeleteBottomMenu(stringDirectory).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+            var arrayEntries = stringDirectory.Split('#');
+            foreach (var entry in arrayEntries)
+            {
+                if (entry.Contains("<Name>"))
+                {
+                    var entryFixed = entry.Replace("<Name>", string.Empty)
+                                          .Replace("</Name>", "#")
+                                          .Replace("</Telephone>", string.Empty)
+                                          .Replace("<Telephone>", string.Empty);
+
+                    var arrayEntry = entryFixed.Split('#');
+                    var IpEntry = new IPPhoneDirectoryEntry();
+                    var name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                    if (name != null && ("[xx] " + name).Length > 32)
+                    {
+                        while (("[xx]" + name).Length > 32)
+                            name = name.Substring(0, name.Length - 1);
+                    }
+                    IpEntry.Name = name;
+                    IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+                    entriesList.Add(IpEntry);
+                }
+            }
+
+
+            var XmlPageDirectory = "<CiscoIPPhoneDirectory>" + Environment.NewLine;
+            foreach (var item in entriesList)
+            {
+                item.Name = "[" + country.Code.ToUpper() + "] " + item.Name;
+                if (item.Name.Length > 32)
+                    item.Name = item.Name.Substring(0, item.Name.Length - 1);
+                XmlPageDirectory += item.ToString();
+            }
+
+            XmlPageDirectory += Environment.NewLine + "<Prompt>" + stringPrompt + "</Prompt>" + Environment.NewLine;
+
+            if(hasDial)
+                XmlPageDirectory += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
+            if(hasEditDial)
+                XmlPageDirectory += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
+            if(hasExit)
+                XmlPageDirectory += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
+            if(hasNext)
+                XmlPageDirectory += BuildSoftKey(SoftKey.Next.ToString(), "<URL> " + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + " </URL>", 4);
+            if(hasSearch)
+                XmlPageDirectory += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 5);
+
+            XmlPageDirectory += Environment.NewLine + "</CiscoIPPhoneDirectory>";
+
+            return XmlPageDirectory;
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////
+            //var language = GetLanguageApplication();
+            //stringDirectory = stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ");
+            //stringDirectory = stringDirectory.Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"));
+            //stringDirectory = stringDirectory.Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ");
+            //stringDirectory = stringDirectory.Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ");
+            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial");
+            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search");
+            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit");
+            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial");
+            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next");
+            //stringDirectory = stringDirectory.Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix);
+            //stringDirectory = stringDirectory.Replace("<URL>" + GetClusterUrlByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
+            //                                         "<URL>" + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>");
+            //stringDirectory = stringDirectory.Replace(("<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
+            //                                           "<URL>" + GetUrlLocalHostLanding() + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start");
+            //stringDirectory = stringDirectory.Replace("<?xml version=\"1.0\"?>", "");
+            //return stringDirectory;
         }
 
         /// <summary>
@@ -355,7 +439,7 @@ namespace CustomDirectory.v2
                         var arrayEntry = entryFixed.Split('#');
                         var IpEntry = new IPPhoneDirectoryEntry();
                         var name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
-                        if (name != null && ("[xx]" + name).Length > 32)
+                        if (name != null && ("[xx] " + name).Length > 32)
                         {
                             while (("[xx]" + name).Length > 32)
                                 name = name.Substring(0, name.Length - 1);
