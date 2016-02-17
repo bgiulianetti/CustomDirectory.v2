@@ -265,8 +265,6 @@ namespace CustomDirectory.v2
         /// <returns></returns>
         private string FixFormatForSingleCountry(string stringDirectory, Country country, string first, string last, string number, string start)
         {
-            //////////////////////////////////
-
             var hasDial = false;
             var hasEditDial = false;
             var hasExit = false;
@@ -347,25 +345,6 @@ namespace CustomDirectory.v2
             XmlPageDirectory += Environment.NewLine + "</CiscoIPPhoneDirectory>";
 
             return XmlPageDirectory;
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////
-            //var language = GetLanguageApplication();
-            //stringDirectory = stringDirectory.Replace("<Name>", "<Name>[" + country.Code.ToUpper() + "] ");
-            //stringDirectory = stringDirectory.Replace("<Prompt>Records", "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records"));
-            //stringDirectory = stringDirectory.Replace(" to ", " " + ConfigurationManager.AppSettings.Get(language + ".To") + " ");
-            //stringDirectory = stringDirectory.Replace(" of ", " " + ConfigurationManager.AppSettings.Get(language + ".Of") + " ");
-            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Dial", "<Name>Dial");
-            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Search", "<Name>Search");
-            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Exit", "<Name>Exit");
-            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] EditDial", "<Name>EditDial");
-            //stringDirectory = stringDirectory.Replace("<Name>[" + country.Code.ToUpper() + "] Next", "<Name>Next");
-            //stringDirectory = stringDirectory.Replace("<Telephone>", "<Telephone>" + country.ExternalPrefix);
-            //stringDirectory = stringDirectory.Replace("<URL>" + GetClusterUrlByCountryName(country.Name) + BuildQueryStringSearch(first, last, number, (Int32.Parse(start) + 31).ToString()).Replace("&", "&amp;") + "</URL>",
-            //                                         "<URL>" + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + "</URL>");
-            //stringDirectory = stringDirectory.Replace(("<URL>" + GetClusterLandingUrlByCountryName(country.Name) + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start"),
-            //                                           "<URL>" + GetUrlLocalHostLanding() + "</URL>").Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start");
-            //stringDirectory = stringDirectory.Replace("<?xml version=\"1.0\"?>", "");
-            //return stringDirectory;
         }
 
         /// <summary>
@@ -441,7 +420,7 @@ namespace CustomDirectory.v2
                         var name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
                         if (name != null && ("[xx] " + name).Length > 32)
                         {
-                            while (("[xx]" + name).Length > 32)
+                            while (("[xx] " + name).Length > 32)
                                 name = name.Substring(0, name.Length - 1);
                         }
                         IpEntry.Name = name;
