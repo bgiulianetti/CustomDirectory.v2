@@ -312,7 +312,7 @@ namespace CustomDirectory.v2
                     var name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
                     if (name != null && ("[xx] " + name).Length > 32)
                     {
-                        while (("[xx]" + name).Length > 32)
+                        while (("[xx] " + name).Length > 32)
                             name = name.Substring(0, name.Length - 1);
                     }
                     IpEntry.Name = name;
