@@ -338,7 +338,7 @@ namespace CustomDirectory.v2
             if(hasExit)
                 XmlPageDirectory += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
             if(hasNext)
-                XmlPageDirectory += BuildSoftKey(SoftKey.Next.ToString(), "<URL> " + GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;") + " </URL>", 4);
+                XmlPageDirectory += BuildSoftKey(SoftKey.Next.ToString(),  GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, (Int32.Parse(start) + 31).ToString(), country.Code).Replace("&", "&amp;"), 4);
             if(hasSearch)
                 XmlPageDirectory += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 5);
 
