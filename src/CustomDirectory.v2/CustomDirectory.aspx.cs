@@ -51,7 +51,7 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
-            if(!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
+            if (!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
             {
                 xmlOutput = FormatErrorMessage("Invalid Country");
             }
@@ -354,7 +354,13 @@ namespace CustomDirectory.v2
 
                         var arrayEntry = entryFixed.Split('#');
                         var IpEntry = new IPPhoneDirectoryEntry();
-                        IpEntry.Name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                        var name = arrayEntry[0].Replace("\r\n", string.Empty).TrimStart();
+                        if (name != null && ("[xx]" + name).Length > 32)
+                        {
+                            while (("[xx]" + name).Length > 32)
+                                name = name.Substring(0, name.Length - 1);
+                        }
+                        IpEntry.Name = name;
                         IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
                         list.Add(IpEntry);
                     }
