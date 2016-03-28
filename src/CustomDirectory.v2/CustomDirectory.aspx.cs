@@ -314,7 +314,7 @@ namespace CustomDirectory.v2
                             name = name.Substring(0, name.Length - 1);
                     }
                     IpEntry.Name = name;
-                    IpEntry.Telephone = arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
+                    IpEntry.Telephone = country.ExternalPrefix + arrayEntry[1].Replace(" ", string.Empty).Replace("\r\n", string.Empty);
                     entriesList.Add(IpEntry);
                 }
             }
