@@ -114,6 +114,9 @@
     <Content Include="Resources\Countries.Metadata\Countries.ConoSur.json" />
     <Content Include="Resources\Clusters.json" />
     <Content Include="Resources\Countries.Metadata\Countries.Argentina.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.ConoNorte.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.Paraguay.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.Brasil.json" />
     <None Include="Web.Argentina.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
