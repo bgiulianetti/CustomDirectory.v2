@@ -3,7 +3,7 @@
         "Name": "Argentina",
         "Code": "ar",
         "InternalPrefix": [],
-        "ExternalPrefix": "",
+        "ExternalPrefix": "*188",
         "NumberLength": "",
         "Cluster": "Argentina"
     },
@@ -27,7 +27,7 @@
         "Name": "Brasil",
         "Code": "br",
         "InternalPrefix": ["41"],
-        "ExternalPrefix": "*188",
+        "ExternalPrefix": "*18",
         "NumberLength": "6",
         "Cluster": "Brasil"
     },
@@ -35,7 +35,7 @@
         "Name": "Estados Unidos",
         "Code": "us",
         "InternalPrefix": ["5"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "4",
         "Cluster": "ConoNorte"
     },
@@ -67,7 +67,7 @@
         "Name": "Mexico",
         "Code": "mx",
         "InternalPrefix": ["51"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "3",
         "Cluster": "ConoNorte"
     },
@@ -91,7 +91,7 @@
         "Name": "España",
         "Code": "es",
         "InternalPrefix": ["634", "635", "636", "637"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "2",
         "Cluster": "ConoNorte"
     },
@@ -99,7 +99,7 @@
         "Name": "Holanda",
         "Code": "nl",
         "InternalPrefix": ["624", "625"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "0",
         "Cluster": "ConoNorte"
     },
@@ -107,7 +107,7 @@
         "Name": "Francia",
         "Code": "fr",
         "InternalPrefix": ["620", "621"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "2",
         "Cluster": "ConoNorte"
     },
@@ -115,7 +115,7 @@
         "Name": "Reino Unido",
         "Code": "uk",
         "InternalPrefix": ["622", "623"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "2",
         "Cluster": "ConoNorte"
     },

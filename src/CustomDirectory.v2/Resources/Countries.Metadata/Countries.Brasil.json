@@ -3,7 +3,7 @@
         "Name": "Argentina",
         "Code": "ar",
         "InternalPrefix": [],
-        "ExternalPrefix": "",
+        "ExternalPrefix": "*188",
         "NumberLength": "",
         "Cluster": "Argentina"
     },
@@ -27,7 +27,7 @@
         "Name": "Brasil",
         "Code": "br",
         "InternalPrefix": ["41"],
-        "ExternalPrefix": "*188",
+        "ExternalPrefix": "",
         "NumberLength": "6",
         "Cluster": "Brasil"
     },
