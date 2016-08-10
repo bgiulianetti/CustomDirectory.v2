@@ -28,6 +28,7 @@ namespace CustomDirectory.v2.Model
 
     public enum SoftKey
     {
+        Cancel,
         Dial,
         EditDial,
         Exit,
