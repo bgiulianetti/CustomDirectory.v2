@@ -334,7 +334,7 @@ namespace CustomDirectory.v2
             if(hasDial)
                 XmlPageDirectory += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
             if(hasEditDial)
-                XmlPageDirectory += BuildSoftKey(SoftKey.EditDial.ToString(), "SoftKey:" + SoftKey.EditDial.ToString(), 2);
+                XmlPageDirectory += BuildSoftKey(SoftKey.Cancel.ToString(), "SoftKey:" + SoftKey.Cancel.ToString(), 2);
             if(hasExit)
                 XmlPageDirectory += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
             if(hasNext)
