@@ -46,11 +46,6 @@ namespace CustomDirectory.v2
             else
                 last = ReplaceAccentuation(last);
 
-            //if (countryCode == null || countryCode.Replace(" ", "") == string.Empty)
-            //    countryCode = string.Empty;
-            //else
-            //    countryCode.ToLower();
-
             if (number == null) number = string.Empty;
             if (start == null) start = "1";
             if (page == null) page = "1";
@@ -584,22 +579,21 @@ namespace CustomDirectory.v2
             }
             xmlOutput += "<Prompt>" + ConfigurationManager.AppSettings.Get(language + ".Records") + " " + start.ToString() + " a " + (entriesPerPage).ToString() + " de " + totalEntries.ToString() + "</Prompt>" + Environment.NewLine;
             xmlOutput += BuildSoftKey(SoftKey.Dial.ToString(), "SoftKey:" + SoftKey.Dial.ToString(), 1);
-            xmlOutput += BuildSoftKey(SoftKey.Cancel.ToString(), "SoftKey:" + SoftKey.Cancel.ToString(), 2);
-            xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 3);
+            xmlOutput += BuildSoftKey(SoftKey.Exit.ToString(), "SoftKey:" + SoftKey.Exit.ToString(), 2);
             if (showNext)
             {
                 if (countryCode != string.Empty)
                 {
                     var urlReplacedAmpersand = GetUrlLocalHost() + BuildQueryStringSearchWithCountryParameter(first, last, number, "", countryCode, (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page=").Replace("&p", "&amp;p");
-                    xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), urlReplacedAmpersand, 4);
+                    xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), urlReplacedAmpersand, 3);
                 }
                 else
                 {
                     var urlReplacedAmpersand = GetUrlLocalHost() + BuildQueryStringSearch(first, last, number, "", (intPage + 1).ToString()).Replace("&f", "&amp;f").Replace("&n", "&amp;n").Replace("&start", "&amp;start").Replace("&page=", "&amp;page=");
-                    xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), urlReplacedAmpersand, 4);
+                    xmlOutput += BuildSoftKey(SoftKey.Next.ToString(), urlReplacedAmpersand, 3);
                 }
             }
-            xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 5);
+            xmlOutput += BuildSoftKey(SoftKey.Search.ToString(), GetUrlLocalHostLanding(), 4);
             xmlOutput += "</CiscoIPPhoneDirectory>";
 
             return xmlOutput;
