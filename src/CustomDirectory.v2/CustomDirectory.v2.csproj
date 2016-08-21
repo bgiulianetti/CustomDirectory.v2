@@ -120,10 +120,19 @@
     <None Include="Web.Argentina.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <None Include="Web.Brasil.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.ConoNorte.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
     <None Include="Web.ConoSur.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Paraguay.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Release.config">
@@ -138,6 +147,15 @@
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ConoSur|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Paraguay|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ConoNorte|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Brasil|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
