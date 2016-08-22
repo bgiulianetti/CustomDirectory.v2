@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "Name": "Argentina",
         "Code": "ar",
@@ -11,7 +11,7 @@
         "Name": "Chile",
         "Code": "cl",
         "internalPrefix": [],
-        "ExternalPrefix": "",
+        "ExternalPrefix": "*18",
         "NumberLength": "",
         "Cluster": "ConoSur"
     },
@@ -59,7 +59,7 @@
         "Name": "Uruguay",
         "Code": "uy",
         "InternalPrefix": ["751", "752"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "2",
         "Cluster": "ConoSur"
     },
@@ -88,7 +88,7 @@
         "Cluster": "ConoSur"
     },
     {
-        "Name": "Espa�a",
+        "Name": "España",
         "Code": "es",
         "InternalPrefix": ["634", "635", "636", "637"],
         "ExternalPrefix": "*18",
@@ -115,7 +115,7 @@
         "Name": "Reino Unido",
         "Code": "uk",
         "InternalPrefix": ["622", "623"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "2",
         "Cluster": "ConoNorte"
     },

@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomDirectory.aspx" />
+    <None Include="Resources\Countries.Metadata\Countries.AU.json" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -111,31 +112,78 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\pub.pubxml" />
-    <Content Include="Resources\Countries.Metadata\Countries.ConoSur.json" />
     <Content Include="Resources\Clusters.json" />
-    <Content Include="Resources\Countries.Metadata\Countries.Argentina.json" />
-    <Content Include="Resources\Countries.Metadata\Countries.ConoNorte.json" />
-    <Content Include="Resources\Countries.Metadata\Countries.Paraguay.json" />
-    <Content Include="Resources\Countries.Metadata\Countries.Brasil.json" />
-    <None Include="Web.Argentina.config">
+    <Content Include="Resources\Countries.Metadata\Countries.AR.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.BO.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.BR.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.CL.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.CO.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.DE.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.ES.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.FR.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.MX.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.NL.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.PE.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.PY.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.UK.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.US.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.UY.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.VE.json" />
+    <None Include="Web.AR.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-    <None Include="Web.Brasil.config">
+    <None Include="Web.AU.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-    <None Include="Web.ConoNorte.config">
+    <None Include="Web.BO.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-    <None Include="Web.ConoSur.config">
+    <None Include="Web.BR.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.CL.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.CO.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.DE.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-    <None Include="Web.Paraguay.config">
+    <None Include="Web.ES.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.FR.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.MX.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.NL.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.PE.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.PY.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.UK.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.US.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.UY.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.VE.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
@@ -143,19 +191,55 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Argentina|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AR|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ConoSur|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BO|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Paraguay|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AU|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ConoNorte|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BR|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Brasil|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CL|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CO|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DE|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ES|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'FR|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MX|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NL|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PE|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PY|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UK|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'US|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UY|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VE|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

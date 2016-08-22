@@ -19,7 +19,7 @@
         "Name": "Paraguay",
         "Code": "py",
         "InternalPrefix": [],
-        "ExternalPrefix": "",
+        "ExternalPrefix": "*18",
         "NumberLength": "2",
         "Cluster": "Paraguay"
     },
@@ -51,7 +51,7 @@
         "Name": "Peru",
         "Code": "pe",
         "InternalPrefix": ["73","74"],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "3",
         "Cluster": "ConoSur"
     },

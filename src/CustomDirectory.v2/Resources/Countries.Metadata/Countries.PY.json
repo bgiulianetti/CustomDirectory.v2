@@ -19,7 +19,7 @@
         "Name": "Paraguay",
         "Code": "py",
         "InternalPrefix": [],
-        "ExternalPrefix": "*18",
+        "ExternalPrefix": "",
         "NumberLength": "2",
         "Cluster": "Paraguay"
     },
@@ -27,7 +27,7 @@
         "Name": "Brasil",
         "Code": "br",
         "InternalPrefix": ["41"],
-        "ExternalPrefix": "",
+        "ExternalPrefix": "*18",
         "NumberLength": "6",
         "Cluster": "Brasil"
     },
