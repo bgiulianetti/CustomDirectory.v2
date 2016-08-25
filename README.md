@@ -9,3 +9,5 @@ Pantallas no contienen caracteres especiales
 
 FALTA: Prueba de ExternalPrefix en Countries.xx.json
 ```
+
+Consumido por Landing (stable version) [CustomDirectory.Landing] (https://github.com/bgiulianetti/CustomDirectory.v2.Landing/tree/stableVersion(2016/08/25))
