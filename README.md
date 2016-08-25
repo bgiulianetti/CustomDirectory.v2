@@ -1,5 +1,5 @@
-# Stable Version - 25/08/2016
-
+###### Stable Version - 25/08/2016
+```
 Version estable. 
 No incluye: Cluster Contact Center.
 
@@ -8,3 +8,4 @@ Funciona en todos los modelos de teléfonos
 Pantallas no contienen caracteres especiales
 
 FALTA: Prueba de ExternalPrefix en Countries.xx.json
+```
