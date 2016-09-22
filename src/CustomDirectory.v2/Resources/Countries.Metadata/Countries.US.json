@@ -34,9 +34,9 @@
     {
         "Name": "Estados Unidos",
         "Code": "us",
-        "InternalPrefix": ["5"],
-        "ExternalPrefix": "",
-        "NumberLength": "4",
+        "InternalPrefix": ["50", "52","53","54","55","56","57","58","59"],
+        "ExternalPrefix": "*18",
+        "NumberLength": "3",
         "Cluster": "ConoNorte"
     },
     {
