@@ -16,7 +16,12 @@
         "IPAdress": "10.13.11.10:8080"
     },
     {
-        "Name": "Brasil",
-        "IPAdress": "10.7.250.231:8080"
+      "Name": "Brasil",
+      "IPAdress": "10.7.250.231:8080"
+    },
+    {
+      "Name": "ContactCenter",
+      "IPAdress": "10.8.23.20:8080"
     }
+
 ]

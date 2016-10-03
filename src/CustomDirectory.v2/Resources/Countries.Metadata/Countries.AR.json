@@ -1,138 +1,166 @@
 ﻿[
-    {
-        "Name": "Argentina",
-        "Code": "ar",
-        "InternalPrefix": [],
-        "ExternalPrefix": "",
-        "NumberLength": "",
-        "Cluster": "Argentina"
-    },
-    {
-        "Name": "Chile",
-        "Code": "cl",
-        "internalPrefix": [],
-        "ExternalPrefix": "*18",
-        "NumberLength": "",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "Paraguay",
-        "Code": "py",
-        "InternalPrefix": [],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "Paraguay"
-    },
-    {
-        "Name": "Brasil",
-        "Code": "br",
-        "InternalPrefix": ["41"],
-        "ExternalPrefix": "*188",
-        "NumberLength": "6",
-        "Cluster": "Brasil"
-    },
-    {
-        "Name": "Estados Unidos",
-        "Code": "us",
-        "InternalPrefix": ["50", "52","53","54","55","56","57","58","59"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "3",
-        "Cluster": "ConoNorte"
-    },
-    {
-        "Name": "Colombia",
-        "Code": "co",
-        "InternalPrefix": ["71", "72"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "3",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "Peru",
-        "Code": "pe",
-        "InternalPrefix": ["73","74"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "3",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "Uruguay",
-        "Code": "uy",
-        "InternalPrefix": ["751", "752"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "Mexico",
-        "Code": "mx",
-        "InternalPrefix": ["51"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "3",
-        "Cluster": "ConoNorte"
-    },
-    {
-        "Name": "Venezuela",
-        "Code": "ve",
-        "InternalPrefix": ["754"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "Bolivia",
-        "Code": "bo",
-        "InternalPrefix": ["753"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "España",
-        "Code": "es",
-        "InternalPrefix": ["634", "635", "636", "637"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoNorte"
-    },
-    {
-        "Name": "Holanda",
-        "Code": "nl",
-        "InternalPrefix": ["624", "625"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "0",
-        "Cluster": "ConoNorte"
-    },
-    {
-        "Name": "Francia",
-        "Code": "fr",
-        "InternalPrefix": ["620", "621"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoNorte"
-    },
-    {
-        "Name": "Reino Unido",
-        "Code": "uk",
-        "InternalPrefix": ["622", "623"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoNorte"
-    },
-    {
-        "Name": "Alemania",
-        "Code": "de",
-        "InternalPrefix": ["648", "649"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoSur"
-    },
-    {
-        "Name": "Australia",
-        "Code": "au",
-        "InternalPrefix": ["760"],
-        "ExternalPrefix": "*18",
-        "NumberLength": "2",
-        "Cluster": "ConoSur"
-    }
+  {
+    "Name": "Argentina",
+    "Code": "ar",
+    "InternalPrefix": [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" ],
+    "ExternalPrefix": "",
+    "NumberLength": "4",
+    "Cluster": "Argentina"
+  },
+  {
+    "Name": "Chile",
+    "Code": "cl",
+    "internalPrefix": [ "1", "2", "3", "4", "5", "61", "62", "63", "641", "642", "643", "644", "645", "646", "647", "65", "66", "67", "68", "69", "70", "755", "756", "757", "758", "759", "761", "762", "763", "764", "765", "766", "767", "768", "769", "77", "78", "79", "8", "9"],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "Paraguay",
+    "Code": "py",
+    "InternalPrefix": [ ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "3",
+    "Cluster": "Paraguay"
+  },
+  {
+    "Name": "Brasil",
+    "Code": "br",
+    "InternalPrefix": [ "41" ],
+    "ExternalPrefix": "*188",
+    "NumberLength": "8",
+    "Cluster": "Brasil"
+  },
+  {
+    "Name": "Estados Unidos",
+    "Code": "us",
+    "InternalPrefix": [ "50", "52", "53", "54", "55", "56", "57", "58", "59" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoNorte"
+  },
+  {
+    "Name": "Colombia",
+    "Code": "co",
+    "InternalPrefix": [ "71", "72" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "Peru",
+    "Code": "pe",
+    "InternalPrefix": [ "73", "74" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "Uruguay",
+    "Code": "uy",
+    "InternalPrefix": [ "751", "752" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "Mexico",
+    "Code": "mx",
+    "InternalPrefix": [ "51" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoNorte"
+  },
+  {
+    "Name": "Venezuela",
+    "Code": "ve",
+    "InternalPrefix": [ "754" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "Bolivia",
+    "Code": "bo",
+    "InternalPrefix": [ "753" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "España",
+    "Code": "es",
+    "InternalPrefix": [ "634", "635", "636", "637" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoNorte"
+  },
+  {
+    "Name": "Holanda",
+    "Code": "nl",
+    "InternalPrefix": [ "624", "625" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "3",
+    "Cluster": "ConoNorte"
+  },
+  {
+    "Name": "Francia",
+    "Code": "fr",
+    "InternalPrefix": [ "620", "621" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoNorte"
+  },
+  {
+    "Name": "Reino Unido",
+    "Code": "uk",
+    "InternalPrefix": [ "622", "623" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoNorte"
+  },
+  {
+    "Name": "Alemania",
+    "Code": "de",
+    "InternalPrefix": [ "648", "649" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+  {
+    "Name": "Australia",
+    "Code": "au",
+    "InternalPrefix": [ "760" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ConoSur"
+  },
+
+  //---------------------------------------------------------
+
+  {
+    "Name": "Argentina",
+    "Code": "ar",
+    "InternalPrefix": [ "995" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ContactCenter"
+  },
+  {
+    "Name": "Chile",
+    "Code": "cl",
+    "InternalPrefix": [ "98" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "3",
+    "Cluster": "ContactCenter"
+  },
+  {
+    "Name": "Peru",
+    "Code": "pe",
+    "InternalPrefix": [ "990", "991", "992", "993", "994" ],
+    "ExternalPrefix": "*18",
+    "NumberLength": "5",
+    "Cluster": "ContactCenter"
+  }
+
 ]

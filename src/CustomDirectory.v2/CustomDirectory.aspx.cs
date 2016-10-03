@@ -24,12 +24,13 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = Request.QueryString["f"];
+            var first = "a";// Request.QueryString["f"];
             var last = Request.QueryString["l"];
 
-            string countryCode = "";
-            if (!string.IsNullOrEmpty(Request.QueryString["p"]))
-                countryCode = ValidateCountry(Request.QueryString["p"]);
+            var countryCode = "";
+            var QScountryCode = "pe";//Request.QueryString["p"];
+            if (!string.IsNullOrEmpty(QScountryCode))
+                countryCode = ValidateCountry(QScountryCode);
 
 
             var number = Request.QueryString["n"];
@@ -51,14 +52,14 @@ namespace CustomDirectory.v2
             if (page == null) page = "1";
             #endregion
 
-            if (!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode) == null)
+            if (!string.IsNullOrEmpty(countryCode) && GetCountryByCode(countryCode).Count < 0)
             {
                 xmlOutput = FormatErrorMessage("Invalid Country");
             }
             //Paises con Cluster Dedicados
             else if (GetCountryCodesWithDedicatedCluster().Contains(countryCode))
             {
-                var country = GetCountryByCode(countryCode);
+                var country = GetCountryByCode(countryCode).FirstOrDefault();
                 if (country == null)
                 {
                     xmlOutput = FormatErrorMessage("Invalid Country");
@@ -85,23 +86,29 @@ namespace CustomDirectory.v2
                 var directories = new List<IPPhoneDirectory>();
                 try
                 {
-                    var country = GetCountryByCode(countryCode);
-                    var url = GetClusterUrlByCountryName(country.Name);
-                    foreach (var itemNumber in country.InternalPrefix)
+                    var countryList = GetCountryByCode(countryCode);
+                    if (countryList.Count == 0)
+                        throw new Exception("Invalid Country");
+                    foreach (var country in countryList)
                     {
-                        directories.AddRange(GetAllDirectoriesForCountriesWithSameClusterAndWithPrefixes(first, last, itemNumber, start, country));
+                        foreach (var itemNumber in country.InternalPrefix)
+                        {
+                            directories.AddRange(GetAllDirectoriesForCountriesWithSameClusterAndWithPrefixes(first, last, itemNumber, start, country));
+                        }
                     }
+
+
                     if (directories.Count > 0)
                     {
                         var allEntries = GetEntriesOrderedAndWithPrefix(directories);
                         var entriesOfTheCountry = new List<IPPhoneDirectoryEntry>();
                         foreach (var entry in allEntries)
                         {
-                            if (entry.Name.StartsWith("[" + country.Code.ToUpper() + "]"))
+                            if (entry.Name.StartsWith("[" + countryList.FirstOrDefault().Code.ToUpper() + "]"))
                                 entriesOfTheCountry.Add(entry);
                         }
                         var selectedEntries = SelectEntriesByPage(entriesOfTheCountry, Int32.Parse(page));
-                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, entriesOfTheCountry.Count, country.Code);
+                        xmlOutput = BuildXML(selectedEntries, first, last, number, page, entriesOfTheCountry.Count, countryList.FirstOrDefault().Code);
                         xmlOutput = FixAccentuation(xmlOutput);
                     }
                     else
@@ -806,14 +813,23 @@ namespace CustomDirectory.v2
             foreach (var country in countries)
             {
                 var isDedicated = true;
-                for (int i = 0; i < countries.Count; i++)
+                if (countryCodesList.Count > 0 && countryCodesList.Contains(country.Code))
                 {
-                    if (country.Cluster == countries[i].Cluster && country.Name != countries[i].Name)
+                    countryCodesList.Remove(country.Code);
+                    isDedicated = false;
+                }
+                else
+                {
+                    for (int i = 0; i < countries.Count; i++)
                     {
-                        isDedicated = false;
-                        break;
+                        if (country.Cluster == countries[i].Cluster && country.Name != countries[i].Name)
+                        {
+                            isDedicated = false;
+                            break;
+                        }
                     }
                 }
+                
                 if (isDedicated)
                     countryCodesList.Add(country.Code);
             }
@@ -862,19 +878,6 @@ namespace CustomDirectory.v2
             return countryCodesList;
         }
 
-        private List<Country> GetCountriesFromSameCluster(string countryCode)
-        {
-            var myCluster = GetCountryByCode(countryCode).Cluster;
-            var listCountry = new List<Country>();
-            var countries = GetAvailableCountries();
-            foreach (var country in countries)
-            {
-                if (country.Cluster == myCluster)
-                    listCountry.Add(country);
-            }
-            return listCountry;
-        }
-
         private List<Country> GetCountriesFromCluster(string clusterName)
         {
             var countriesList = new List<Country>();
@@ -906,7 +909,8 @@ namespace CustomDirectory.v2
             {
                 foreach (var prefix in country.InternalPrefix)
                 {
-                    var numberLengthWithPrefix = prefix.Length + Int32.Parse(country.NumberLength);
+                    var lengthWithoutPrefix = Int32.Parse(country.NumberLength) - prefix.Length;
+                    var numberLengthWithPrefix = prefix.Length + lengthWithoutPrefix;
                     if (entry.Telephone.StartsWith(prefix) && entry.Telephone.Length == numberLengthWithPrefix)
                     {
                         countryReponse = country;
@@ -927,15 +931,16 @@ namespace CustomDirectory.v2
         /// </summary>
         /// <param name="countryCode"></param>
         /// <returns></returns>
-        private Country GetCountryByCode(string countryCode)
+        private List<Country> GetCountryByCode(string countryCode)
         {
+            var countryCodeList = new List<Country>();
             var countries = GetAvailableCountries();
             foreach (var countryItem in countries)
             {
                 if (string.Equals(countryCode, countryItem.Code, StringComparison.InvariantCultureIgnoreCase))
-                    return countryItem;
+                    countryCodeList.Add(countryItem);
             }
-            return null;
+            return countryCodeList;
         }
 
         private Country GetCountryByName(string countryName)
