@@ -24,13 +24,13 @@ namespace CustomDirectory.v2
             #region QueryStrings
             var xmlOutput = string.Empty;
             var language = GetLanguageApplication();
-            var first = "a";// Request.QueryString["f"];
+            var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
 
             var countryCode = "";
-            var QScountryCode = "pe";//Request.QueryString["p"];
-            if (!string.IsNullOrEmpty(QScountryCode))
-                countryCode = ValidateCountry(QScountryCode);
+            var QueryStringCountryCode = Request.QueryString["p"];
+            if (!string.IsNullOrEmpty(QueryStringCountryCode))
+                countryCode = ValidateCountry(QueryStringCountryCode);
 
 
             var number = Request.QueryString["n"];
