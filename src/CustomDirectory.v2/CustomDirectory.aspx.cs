@@ -302,9 +302,12 @@ namespace CustomDirectory.v2
             }
 
             if (stringDirectory.Contains("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"))
-                stringDirectory = DeleteBottomMenuClusterBrasil(stringDirectory).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+                stringDirectory = DeleteBottomMenuClusterBrasil(stringDirectory);
             else
-                stringDirectory = DeleteBottomMenu(stringDirectory).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+                stringDirectory = DeleteBottomMenu(stringDirectory);
+
+            stringDirectory = stringDirectory.Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+
             var arrayEntries = stringDirectory.Split('#');
             foreach (var entry in arrayEntries)
             {
@@ -372,8 +375,16 @@ namespace CustomDirectory.v2
 
         private string DeleteBottomMenuClusterBrasil(string stringDirectory)
         {
-            stringDirectory = stringDirectory.Substring(806, stringDirectory.Length - 830);
-            return stringDirectory;
+            int i = 0;
+            while (i <= stringDirectory.Length)
+            {
+                if (stringDirectory[i] == '<' && stringDirectory[i + 1] == 'D')
+                    break;
+                i++;
+            }
+
+            stringDirectory = stringDirectory.Substring(i, stringDirectory.Length - i);
+            return stringDirectory.Replace("</CiscoIPPhoneDirectory>", "");
         }
 
         /// <summary>
