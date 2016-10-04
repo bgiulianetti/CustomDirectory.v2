@@ -27,10 +27,10 @@ namespace CustomDirectory.v2
             var first = Request.QueryString["f"];
             var last = Request.QueryString["l"];
 
-            var countryCode = "";
-            var QueryStringCountryCode = Request.QueryString["p"];
-            if (!string.IsNullOrEmpty(QueryStringCountryCode))
-                countryCode = ValidateCountry(QueryStringCountryCode);
+            var countryCode = string.Empty;
+            var CountryCodeQueryString = Request.QueryString["p"];
+            if (!string.IsNullOrEmpty(CountryCodeQueryString))
+                countryCode = ValidateCountry(CountryCodeQueryString);
 
 
             var number = Request.QueryString["n"];
@@ -282,15 +282,15 @@ namespace CustomDirectory.v2
             var prompt = string.Empty;
 
 
-            if (stringDirectory.Contains("<Name>Dial</Name>"))
+            if (stringDirectory.Contains("<Name>Dial</Name>") || stringDirectory.Contains("<Name>Marcar</Name>"))
                 hasDial = true;
-            if (stringDirectory.Contains("<Name>EditDial</Name>"))
+            if (stringDirectory.Contains("<Name>EditDial</Name>") || stringDirectory.Contains("<Name>EditNúm</Name>"))
                 hasEditDial = true;
-            if (stringDirectory.Contains("<Name>Exit</Name>"))
+            if (stringDirectory.Contains("<Name>Exit</Name>") || stringDirectory.Contains("<Name>Salir</Name>"))
                 hasExit = true;
-            if (stringDirectory.Contains("<Name>Next</Name>"))
+            if (stringDirectory.Contains("<Name>Next</Name>") || stringDirectory.Contains("<Name>Siguie.</Name>"))
                 hasNext = true;
-            if (stringDirectory.Contains("<Name>Search</Name>"))
+            if (stringDirectory.Contains("<Name>Search</Name>") || stringDirectory.Contains("<Name>Buscar</Name>"))
                 hasSearch = true;
 
             var promptLocation = stringDirectory.IndexOf("<Prompt>", 0) + 8;
@@ -301,7 +301,10 @@ namespace CustomDirectory.v2
                 promptLocation++;
             }
 
-            stringDirectory = DeleteBottomMenu(stringDirectory).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+            if (stringDirectory.Contains("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"))
+                stringDirectory = DeleteBottomMenuClusterBrasil(stringDirectory).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+            else
+                stringDirectory = DeleteBottomMenu(stringDirectory).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
             var arrayEntries = stringDirectory.Split('#');
             foreach (var entry in arrayEntries)
             {
@@ -364,6 +367,12 @@ namespace CustomDirectory.v2
             for (int i = 0; i < stringDirectory.Length; i++)
                 if (stringDirectory[i].ToString() == "<" && stringDirectory[i + 1].ToString() == "P")
                     stringDirectory = stringDirectory.Substring(0, i);
+            return stringDirectory;
+        }
+
+        private string DeleteBottomMenuClusterBrasil(string stringDirectory)
+        {
+            stringDirectory = stringDirectory.Substring(806, stringDirectory.Length - 830);
             return stringDirectory;
         }
 
