@@ -431,7 +431,14 @@ namespace CustomDirectory.v2
                 if (!directoryPage.Contains("<Name>Next</Name>"))
                     isEmpty = true;
 
-                directoryPage = DeleteBottomMenu(directoryPage).Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+
+                if (directoryPage.Contains("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"))
+                    directoryPage = DeleteBottomMenuClusterBrasil(directoryPage);
+                else
+                    directoryPage = DeleteBottomMenu(directoryPage);
+
+                directoryPage = directoryPage.Replace("<DirectoryEntry>", "#").Replace("</DirectoryEntry>", "");
+
                 var arrayEntries = directoryPage.Split('#');
                 foreach (var entry in arrayEntries)
                 {
