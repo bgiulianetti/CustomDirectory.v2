@@ -375,15 +375,18 @@ namespace CustomDirectory.v2
 
         private string DeleteBottomMenuClusterBrasil(string stringDirectory)
         {
-            int i = 0;
-            while (i <= stringDirectory.Length)
+            if(!stringDirectory.Contains("<Prompt>No coincide ningún registro</Prompt>"))
             {
-                if (stringDirectory[i] == '<' && stringDirectory[i + 1] == 'D')
-                    break;
-                i++;
-            }
+                int i = 0;
+                while (i <= stringDirectory.Length)
+                {
+                    if (stringDirectory[i] == '<' && stringDirectory[i + 1] == 'D')
+                        break;
+                    i++;
+                }
 
-            stringDirectory = stringDirectory.Substring(i, stringDirectory.Length - i);
+                stringDirectory = stringDirectory.Substring(i, stringDirectory.Length - i);
+            }
             return stringDirectory.Replace("</CiscoIPPhoneDirectory>", "");
         }
 
