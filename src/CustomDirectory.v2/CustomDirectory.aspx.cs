@@ -1020,6 +1020,8 @@ namespace CustomDirectory.v2
                 return "nl";
             if (country == "uy" || country == "ur" || country == "uru" || country == "urug" || country == "urugu" || country == "urugua" || country == "uruguay" || country == "urguay" || country == "charrua")
                 return "uy";
+            if (country == "it" || country == "ita" || country == "ital" || country == "itali" || country == "italy" || country == "italia" || country == "itaia" || country == "itala")
+                return "it";
             else
                 return "";
         }
