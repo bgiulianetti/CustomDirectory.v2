@@ -129,6 +129,7 @@
     <Content Include="Resources\Countries.Metadata\Countries.US.json" />
     <Content Include="Resources\Countries.Metadata\Countries.UY.json" />
     <Content Include="Resources\Countries.Metadata\Countries.VE.json" />
+    <Content Include="Resources\Countries.Metadata\Countries.IT.json" />
     <None Include="Web.AR.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -157,6 +158,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.FR.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.IT.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.MX.config">
@@ -240,6 +244,9 @@
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VE|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'IT|AnyCPU'">
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

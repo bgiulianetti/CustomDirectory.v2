@@ -127,10 +127,10 @@
     "Name": "Reino Unido",
     "NumberLength": "5"
   },
-    {
+  {
     "Cluster": "ConoNorte",
     "Code": "it",
-    "ExternalPrefix": "*18",
+    "ExternalPrefix": "",
     "InternalPrefix": [ "639" ],
     "Name": "Italia",
     "NumberLength": "5"
@@ -146,7 +146,7 @@
   {
     "Cluster": "ConoSur",
     "Code": "au",
-    "ExternalPrefix": "",
+    "ExternalPrefix": "*18",
     "InternalPrefix": [ "760" ],
     "Name": "Australia",
     "NumberLength": "5"
@@ -175,5 +175,4 @@
     "Name": "Peru",
     "NumberLength": "5"
   }
-
 ]

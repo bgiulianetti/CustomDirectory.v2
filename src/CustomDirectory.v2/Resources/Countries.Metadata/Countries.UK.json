@@ -107,15 +107,15 @@
     "Cluster": "ConoNorte",
     "Code": "nl",
     "ExternalPrefix": "*18",
-    "InternalPrefix": [ "624", "625" ],
+    "InternalPrefix": [ "631" ],
     "Name": "Holanda",
-    "NumberLength": "3"
+    "NumberLength": "5"
   },
   {
     "Cluster": "ConoNorte",
     "Code": "fr",
     "ExternalPrefix": "*18",
-    "InternalPrefix": [ "620", "621" ],
+    "InternalPrefix": [ "633" ],
     "Name": "Francia",
     "NumberLength": "5"
   },
@@ -123,8 +123,16 @@
     "Cluster": "ConoNorte",
     "Code": "uk",
     "ExternalPrefix": "",
-    "InternalPrefix": [ "622", "623" ],
+    "InternalPrefix": [ "644" ],
     "Name": "Reino Unido",
+    "NumberLength": "5"
+  },
+    {
+    "Cluster": "ConoNorte",
+    "Code": "it",
+    "ExternalPrefix": "*18",
+    "InternalPrefix": [ "639" ],
+    "Name": "Italia",
     "NumberLength": "5"
   },
   {
