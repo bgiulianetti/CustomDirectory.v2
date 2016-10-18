@@ -165,7 +165,7 @@
     "ExternalPrefix": "*18",
     "InternalPrefix": [ "98" ],
     "Name": "Chile",
-    "NumberLength": "3"
+    "NumberLength": "5"
   },
   {
     "Cluster": "ContactCenter",
